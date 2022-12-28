@@ -25,6 +25,10 @@ docker-compose up -d
 docker-compose exec web bash
 ```
 
+```
+npm init
+```
+
 ## 初期リポジトリの構成
 
 ```
