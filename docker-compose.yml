@@ -4,6 +4,6 @@ services:
     build: ./docker/node
     tty: true
     volumes:
-      - ./src:/src
+      - ./app:/var/www
     ports:
       - "3000:3000"

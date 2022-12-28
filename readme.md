@@ -15,6 +15,7 @@ github desktopで`\\wsl.localhost\Ubuntu-20.04\home\okuda\repo\react-test`にclo
 dockerを動かす
 
 ```
+cd /home/[user]/repo/react-test
 docker-compose up -d
 ```
 
@@ -24,10 +25,22 @@ docker-compose up -d
 docker-compose exec web bash
 ```
 
-react プロジェクトを作る
+## 初期リポジトリの構成
 
 ```
-npx create-react-app {AppName}
-or
-npx create-react-app .
+root/
+  ├ dist/
+  │ ├ index.html
+  │ └ main.js
+  │
+  ├ node_modules/
+  │
+  ├ src/
+  │ ├ App.tsx
+  │ └ index.tsx
+  │
+  ├ package.lock.json
+  ├ pacckage.json
+  ├ tsconfig.json
+  └ webpack.config.js
 ```
