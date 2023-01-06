@@ -642,38 +642,43 @@ export default class NotFound extends Component {
 
 ```jsx:app/src/routes/Navbar.jsx
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom'
+import { NavLink } from 'react-router-dom'
 
 export default class Navbar extends Component {
     render() {
 
-      let activeClassName = "active-link";
+        let activeStyle = {
+            'color': 'tomato',
+            'textDecoration': 'none'
+        }
 
-      return (
-        <ul>
-            <li>
-                <NavLink
-                    style={({ isActive }) => (isActive ? { color: 'tomato' } : undefined)}
-                    className={({ isActive }) => (isActive ? activeClassName : undefined)}
-                    to="/"
-                >Home</NavLink>
-            </li>
-            <li>
-                <NavLink
-                    style={({ isActive }) => (isActive ? { color: 'tomato' } : undefined)}
-                    className={({ isActive }) => (isActive ? activeClassName : undefined)}
-                    to="/about"
-                >About</NavLink>
-            </li>
-            <li>
-                <NavLink
-                    style={({ isActive }) => (isActive ? { color: 'tomato' } : undefined)}
-                    className={({ isActive }) => (isActive ? activeClassName : undefined)}
-                    to="/contact"
-                >Contact</NavLink>
-            </li>
-        </ul>
-    )
-  }
+        let activeClass = "active-link";
+
+        return (
+            <ul>
+                <li>
+                    <NavLink
+                        style={({ isActive }) => (isActive ? activeStyle : undefined)}
+                        className={({ isActive }) => (isActive ? activeClass : undefined)}
+                        to="/"
+                    >Home</NavLink>
+                </li>
+                <li>
+                    <NavLink
+                        style={({ isActive }) => (isActive ? activeStyle : undefined)}
+                        className={({ isActive }) => (isActive ? activeClass : undefined)}
+                        to="/about"
+                    >About</NavLink>
+                </li>
+                <li>
+                    <NavLink
+                        style={({ isActive }) => (isActive ? activeStyle : undefined)}
+                        className={({ isActive }) => (isActive ? activeClass : undefined)}
+                        to="/contact"
+                    >Contact</NavLink>
+                </li>
+            </ul>
+        )
+    }
 }
 ```
