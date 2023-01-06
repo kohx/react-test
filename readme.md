@@ -108,8 +108,8 @@ app/
   ├ node_modules/
   │
   ├ src/
-  │ ├ App.tsx
-  │ └ index.tsx
+  │ ├ App.jsx(tsx)
+  │ └ index.jsx(tsx)
   │
   ├ package.lock.json
   ├ pacckage.json
@@ -169,7 +169,7 @@ module.exports = {
 
 ```js:webpack.config.js
   // ...
-  entry: './src/index.tsx',
+  entry: './src/index.jsx',
   // ...
 ```
 
@@ -311,14 +311,24 @@ const path = require('path');
 
 module.exports = {
   mode: 'development',
-  entry: './src/index.tsx',
-  entry: './src/index.tsx',
+  entry: './src/index.jsx',
   output: {
     path: path.join(__dirname, 'dist'),
     filename: 'main.js',
   },
   module: {
     rules: [
+      // js jsx
+      {
+          test: /\.(js|jsx)$/,
+          use: [
+              {
+                  loader: 'babel-loader',
+                  options: { presets: ['@babel/preset-env', '@babel/react'] },
+              },
+          ]
+      },
+      // ts tsx
       {
         test: /\.(ts|tsx)$/,
         use: [
@@ -334,6 +344,7 @@ module.exports = {
           },
         ],
       },
+      // css
       {
         test: /\.scss$/,
         use: ['style-loader', 'css-loader', 'sass-loader']
@@ -347,7 +358,7 @@ module.exports = {
     port: 3000,
   },
   resolve: {
-    extensions: ['.ts', '.tsx', '.js', '.json'],
+    extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
   },
   target: 'web',
 };
@@ -385,26 +396,33 @@ touch app/src/App.tsx
 ### Appコンポーネントを作成
 
 ```tsx:App.tsx
-import React from 'react';
+import React, { Component } from 'react';
 
-export const App: React.VFC = () => {
-  return <div>Hello World!</div>
+export default class App extends Component {
+  render() {
+    return (<div>Hello World!</div>)
+  }
 }
 ```
 
 ### リアクトファイルを作成
 
 ```tsx:index.tsx
-import React from 'react';
-import ReactDOM from 'react-dom';
+import React, { Component } from 'react';
+import { createRoot } from 'react-dom/client';
 
 // Appコンポーネントをインポート
-import { App } from '../src/App';
+import App from './App';
 
-ReactDOM.render(<App />, document.getElementById('root'));
+const rootElement = document.getElementById('root');
+const root = createRoot(rootElement);
+
+root.render(
+  <App />
+);
 ```
 
-### TypeScript の設定
+### TypeScript の設定(使う場合)
 
 TypeScriptの設定ファイルを作成
 
@@ -442,7 +460,7 @@ touch app/tsconfig.json
   "scripts": {
     //  ...
     "build": "webpack",
-    "dev": "webpack serve --open"
+    "dev": "webpack serve"
   },
   //  ...
 }
@@ -457,27 +475,108 @@ npm run dev
 `http://localhost:3000`にアクセスして確認
 
 
-## jsxでも作成可能にする
+## ルーターを追加
+
+### フォルダ構成
+
+```
+app/
+  ├ dist/
+  │ ├ index.html
+  │ └ main.js
+  │
+  ├ node_modules/
+  │
+  ├ src/
+  │ ├ components
+  │ │ └ NavBar.jsx(tsx)
+  │ │ 
+  │ ├ routers/
+  │ │ ├ Home.jsx(tsx)
+  │ │ ├ About.jsx(tsx)
+  │ │ ├ Contact.jsx(tsx)
+  │ │ └ NotFound.jsx(tsx)
+  │ │ 
+  │ ├ App.jsx(tsx)
+  │ └ index.jsx(tsx)
+  │
+  ├ package.lock.json
+  ├ pacckage.json
+  ├ tsconfig.json
+  └ webpack.config.js
+```
+
+### ルータをインストール
+
+```bash
+　npm install react-router-dom@6
+```
+
+### webpackの設定
+
+以下を追加
 
 ```js:app/webpack.config.js
-const path = require('path');
-
-module.exports = {
-    //...
-    module: {
-        rules: [
-            {
-                test: /\.(js|jsx)$/,
-                use: [
-                    {
-                        loader: 'babel-loader',
-                        options: { presets: ['@babel/preset-env', '@babel/react'] },
-                    },
-                ]
-            },
-            //...
-        ],
+ devServer: {
+        //...
+        historyApiFallback: true,
     },
-    //...
-};
 ```
+
+### ルーティングの設定が行えるように`BrowserRouter`タグを設定
+
+```jsx:app/src/index.jsx
+import React, { Component } from 'react';
+import { createRoot } from 'react-dom/client';
+
+// Appコンポーネントをインポート
+import App from './App';
+
+// ルータを追加
+import { BrowserRouter } from 'react-router-dom';
+
+const rootElement = document.getElementById('root');
+const root = createRoot(rootElement);
+
+root.render(
+    // ルータを追加
+    <BrowserRouter>
+        <App />
+    </BrowserRouter>
+);
+```
+
+### ルートの追加
+
+APPにルートを追加していく
+
+```jsx:app/src/App.jsx
+import React, { Component } from 'react';
+
+// ルータを追加
+import { Routes, Route } from 'react-router-dom';
+//　ルートコンポネントを追加
+import Home from './routes/Home';
+import About from './routes/About';
+import Contact from './routes/Contact';
+import NotFound from './routes/NotFound';
+//　ナビのコンポネントを追加
+import Navbar from './components/Navbar';
+
+export default class App extends Component {
+  render() {
+    return (
+      <div className="App">
+        {/* `Routes`タグの中に`Route`タグでパストコンポネントを追加 */}
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </div>
+    );
+  }
+}
+```
+

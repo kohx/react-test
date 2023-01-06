@@ -44,9 +44,9 @@ module.exports = {
             directory: path.join(__dirname, 'dist'),
         },
         port: 3000,
+        historyApiFallback: true,
     },
     resolve: {
-        // extensions: ['.js', '.jsx', '.json'],
         extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
     },
     target: 'web',

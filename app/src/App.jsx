@@ -1,12 +1,28 @@
-import React from 'react';
-import { MemberList } from './components/MemberList';
+import React, { Component } from 'react';
 
-// export const App = () => {
-//   return <div>Hello World!</div>
-// }
+// ルータを追加
+import { Routes, Route } from 'react-router-dom';
+//　ルートコンポネントを追加
+import Home from './routes/Home';
+import About from './routes/About';
+import Contact from './routes/Contact';
+import NotFound from './routes/NotFound';
+//　ナビのコンポネントを追加
+import Navbar from './components/Navbar';
 
-export class App extends React.Component {
+export default class App extends Component {
   render() {
-    return (<h1>Members</h1>);
+    return (
+      <div className="App">
+        <Navbar />
+        {/* `Routes`タグの中に`Route`タグでパストコンポネントを追加 */}
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </div>
+    );
   }
 }
