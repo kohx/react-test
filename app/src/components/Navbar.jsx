@@ -1,18 +1,27 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom'
+import { NavLink } from 'react-router-dom'
 
 export default class Navbar extends Component {
     render() {
         return (
             <ul>
                 <li>
-                    <a href="/">Home</a>
+                    <NavLink
+                        style={({ isActive }) => (isActive ? { color: 'tomato' } : undefined)}
+                        to="/"
+                    >Home</NavLink>
                 </li>
                 <li>
-                    <a href="/about">About</a>
+                    <NavLink
+                        style={({ isActive }) => (isActive ? { color: 'tomato' } : undefined)}
+                        to="/about"
+                    >About</NavLink>
                 </li>
                 <li>
-                    <a href="/contact">Contact</a>
+                    <NavLink
+                        style={({ isActive }) => (isActive ? { color: 'tomato' } : undefined)}
+                        to="/contact"
+                    >Contact</NavLink>
                 </li>
             </ul>
         )

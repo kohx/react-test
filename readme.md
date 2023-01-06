@@ -580,3 +580,85 @@ export default class App extends Component {
 }
 ```
 
+### 各ページを作成
+
+```jsx:app/src/routes/Home.jsx
+import React, { Component } from 'react';
+
+export default class Home extends Component {
+    render() {
+        return (
+            <div>
+                <h1>Home</h1>
+            </div>
+        )
+    }
+}
+```
+
+```jsx:app/src/routes/About.jsx
+import React, { Component } from 'react';
+
+export default class About extends Component {
+    render() {
+        return (
+            <div>
+                <h1>About</h1>
+            </div>
+        )
+    }
+}
+```
+
+```jsx:app/src/routes/Contact.jsx
+import React, { Component } from 'react';
+
+export default class Contact extends Component {
+    render() {
+        return (
+            <div>
+                <h1>Contact</h1>
+            </div>
+        )
+    }
+}
+```
+
+```jsx:app/src/routes/NotFound.jsx
+import React, { Component } from 'react';
+
+export default class NotFound extends Component {
+    render() {
+        return (
+            <div>
+                <h1>NotFound</h1>
+            </div>
+        )
+    }
+}
+```
+
+### ナビを作成
+
+```jsx:app/src/routes/Navbar.jsx
+import React, { Component } from 'react';
+import { Link } from 'react-router-dom'
+
+export default class Navbar extends Component {
+    render() {
+        return (
+            <ul>
+                <li>
+                    <a href="/">Home</a>
+                </li>
+                <li>
+                    <a href="/about">About</a>
+                </li>
+                <li>
+                    <a href="/contact">Contact</a>
+                </li>
+            </ul>
+        )
+    }
+}
+```
