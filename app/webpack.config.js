@@ -2,13 +2,22 @@ const path = require('path');
 
 module.exports = {
     mode: 'development',
-    entry: './src/index.tsx',
+    entry: './src/index.jsx',
     output: {
         path: path.join(__dirname, 'dist'),
         filename: 'main.js',
     },
     module: {
         rules: [
+            {
+                test: /\.(js|jsx)$/,
+                use: [
+                    {
+                        loader: 'babel-loader',
+                        options: { presets: ['@babel/preset-env', '@babel/react'] },
+                    },
+                ]
+            },
             {
                 test: /\.(ts|tsx)$/,
                 use: [
@@ -37,7 +46,8 @@ module.exports = {
         port: 3000,
     },
     resolve: {
-        extensions: ['.ts', '.tsx', '.js', '.json'],
+        // extensions: ['.js', '.jsx', '.json'],
+        extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
     },
     target: 'web',
 };

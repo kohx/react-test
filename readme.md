@@ -455,3 +455,29 @@ npm run dev
 ```
 
 `http://localhost:3000`にアクセスして確認
+
+
+## jsxでも作成可能にする
+
+```js:app/webpack.config.js
+const path = require('path');
+
+module.exports = {
+    //...
+    module: {
+        rules: [
+            {
+                test: /\.(js|jsx)$/,
+                use: [
+                    {
+                        loader: 'babel-loader',
+                        options: { presets: ['@babel/preset-env', '@babel/react'] },
+                    },
+                ]
+            },
+            //...
+        ],
+    },
+    //...
+};
+```
