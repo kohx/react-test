@@ -682,3 +682,42 @@ export default class Navbar extends Component {
     }
 }
 ```
+
+## base url
+
+`import`が複雑になるので`src`フォルダを起点としてインポートできるようにする
+
+```js:app/webpack.config.js
+//...
+resolve: {
+        alias: {
+            '@': path.resolve(__dirname, 'src'), // 追加
+        },
+        extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
+    },
+//...
+```
+
+```json:app/tsconfig.json
+//...
+ "compilerOptions": {
+    //...
+    "baseUrl": "./",
+    "paths": {
+      "@/*": ["src/*"]
+    },
+    //...
+  },
+//...
+```
+
+使用例
+
+```jsx
+// App
+import App from '@/App';
+// css
+import '@/css/App.css';
+```
+
+

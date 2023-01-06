@@ -1,0 +1,9 @@
+.nav-bar {
+    padding: 10px;
+}
+.nav-bar__list {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    list-style: none;
+}

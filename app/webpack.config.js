@@ -34,7 +34,7 @@ module.exports = {
                 ]
             },
             {
-                test: /\.scss$/,
+                test: /\.(css|scss)$/,
                 use: ['style-loader', 'css-loader', 'sass-loader']
             },
         ],
@@ -47,6 +47,9 @@ module.exports = {
         historyApiFallback: true,
     },
     resolve: {
+        alias: {
+            '@': path.resolve(__dirname, 'src'),
+        },
         extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
     },
     target: 'web',
