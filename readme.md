@@ -395,20 +395,18 @@ touch app/src/App.tsx
 
 ### Appコンポーネントを作成
 
-```tsx:App.tsx
-import React, { Component } from 'react';
+```tsx:App.jsx
+import React from 'react';
 
-export default class App extends Component {
-  render() {
+export default () => {
     return (<div>Hello World!</div>)
-  }
 }
 ```
 
 ### リアクトファイルを作成
 
-```tsx:index.tsx
-import React, { Component } from 'react';
+```tsx:index.jsx
+import React from 'react';
 import { createRoot } from 'react-dom/client';
 
 // Appコンポーネントをインポート
@@ -526,7 +524,7 @@ app/
 ### ルーティングの設定が行えるように`BrowserRouter`タグを設定
 
 ```jsx:app/src/index.jsx
-import React, { Component } from 'react';
+import React from 'react';
 import { createRoot } from 'react-dom/client';
 
 // Appコンポーネントをインポート
@@ -551,7 +549,7 @@ root.render(
 APPにルートを追加していく
 
 ```jsx:app/src/App.jsx
-import React, { Component } from 'react';
+import React from 'react';
 
 // ルータを追加
 import { Routes, Route } from 'react-router-dom';
@@ -563,88 +561,82 @@ import NotFound from './routes/NotFound';
 //　ナビのコンポネントを追加
 import Navbar from './components/Navbar';
 
-export default class App extends Component {
-  render() {
-    return (
-      <div className="App">
-        {/* `Routes`タグの中に`Route`タグでパストコンポネントを追加 */}
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </div>
-    );
-  }
+export default () => {
+  return (
+    <div className="App">
+      {/* `Routes`タグの中に`Route`タグでパストコンポネントを追加 */}
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </div>
+  );
 }
 ```
 
 ### 各ページを作成
 
 ```jsx:app/src/routes/Home.jsx
-import React, { Component } from 'react';
+import React from 'react';
 
-export default class Home extends Component {
-    render() {
-        return (
-            <div>
-                <h1>Home</h1>
-            </div>
-        )
-    }
+export default () => {
+    return (
+        <div>
+            <h1>Home</h1>
+        </div>
+    )
 }
 ```
 
 ```jsx:app/src/routes/About.jsx
-import React, { Component } from 'react';
+import React from 'react';
 
-export default class About extends Component {
-    render() {
-        return (
-            <div>
-                <h1>About</h1>
-            </div>
-        )
-    }
+export default () => {
+    return (
+        <div>
+            <h1>About</h1>
+        </div>
+    )
 }
 ```
 
 ```jsx:app/src/routes/Contact.jsx
-import React, { Component } from 'react';
+import React from 'react';
 
-export default class Contact extends Component {
-    render() {
-        return (
-            <div>
-                <h1>Contact</h1>
-            </div>
-        )
-    }
+export default () => {
+    return (
+        <div>
+            <h1>Contact</h1>
+        </div>
+    )
 }
 ```
 
 ```jsx:app/src/routes/NotFound.jsx
-import React, { Component } from 'react';
+import React from 'react';
 
-export default class NotFound extends Component {
-    render() {
-        return (
-            <div>
-                <h1>NotFound</h1>
-            </div>
-        )
-    }
+export default () => {
+    return (
+        <div>
+            <h1>NotFound</h1>
+        </div>
+    )
 }
 ```
 
 ### ナビを作成
 
-```jsx:app/src/routes/Navbar.jsx
-import React, { Component } from 'react';
-import { NavLink } from 'react-router-dom'
+`NavLink`を使うと`isActive`が使える  
 
-export default class Navbar extends Component {
+`navigate`を使うと`onClick={() => navigate('/')}`のようにリダイレクトできる
+
+```jsx:app/src/routes/Navbar.jsx
+import React from 'react';
+import { NavLink, navigate } from 'react-router-dom'
+
+export default () => {
     render() {
 
         let activeStyle = {
@@ -678,6 +670,8 @@ export default class Navbar extends Component {
                     >Contact</NavLink>
                 </li>
             </ul>
+            // 
+            <button onClick={() => navigate('/contact')}>click to Contact</button>
         )
     }
 }

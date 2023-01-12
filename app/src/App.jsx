@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 
 // ルータを追加
 import { Routes, Route } from 'react-router-dom';
@@ -12,19 +12,17 @@ import NotFound from '@/routes/NotFound';
 //　ナビのコンポネントを追加
 import Navbar from '@/components/Navbar';
 
-export default class App extends Component {
-  render() {
-    return (
-      <div className="App">
-        <Navbar />
-        {/* `Routes`タグの中に`Route`タグでパストコンポネントを追加 */}
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </div>
-    );
-  }
+export default () => {
+  return (
+    <div className="App">
+      <Navbar />
+      {/* `Routes`タグの中に`Route`タグでパストコンポネントを追加 */}
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </div>
+  );
 }
