@@ -671,7 +671,7 @@ export default () => {
                 </li>
             </ul>
             // 
-            <button onClick={() => navigate('/contact')}>click to Contact</button>
+            <button onClick={() => navigate('/')}>back to home</button>
         )
     }
 }

@@ -38,7 +38,7 @@ export default () => {
                 </li>
             </ul>
 
-            <button onClick={() => navigate('/')}>Contact</button>
+            <button onClick={() => navigate('/')}>back to home</button>
         </div>
     )
 }
