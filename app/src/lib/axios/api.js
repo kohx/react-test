@@ -2,7 +2,7 @@ import { axios } from '@/lib/axios/axios'
 
 export default {
 
-  getPosts(page = 1, limit = 5) {
+  getPosts(page = 1, limit = 10) {
 
     const start = limit * (page - 1)
 

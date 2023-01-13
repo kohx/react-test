@@ -1,30 +1,30 @@
-import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import React, { useEffect, useState } from 'react'
+import { useParams } from 'react-router-dom'
 import api from '@/lib/axios/api'
 
 export default () => {
 
     // use params
-    const params = useParams();
+    const params = useParams()
 
     // get id
-    const { postId } = useParams();
+    const { postId } = useParams()
 
     // set post state
-    const [post, setPost] = useState({});
+    const [post, setPost] = useState({})
 
     // use effect
     useEffect(() => {
-
+        console.log("location: ", location);
         // cleane
         (async () => {
-            const { status, data } = await api.getPost(postId);
-            console.log(data);
+            const { status, data } = await api.getPost(postId)
+            // console.log(data)
 
-            setPost(data);
+            setPost(data)
         })()
 
-    }, [postId]);
+    }, [postId])
 
     return (
         <div>

@@ -1,18 +1,18 @@
-import React from 'react';
+import React from 'react'
 
 // ルータを追加
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom'
 
 //　ルートコンポネントを追加
-import Home from '@/routes/Home';
-import About from '@/routes/About';
-import Contact from '@/routes/Contact';
-import Posts from '@/routes/Posts';
-import Post from '@/routes/Post';
-import NotFound from '@/routes/NotFound';
+import Home from '@/routes/Home'
+import About from '@/routes/About'
+import Contact from '@/routes/Contact'
+import Posts from '@/routes/Posts'
+import Post from '@/routes/Post'
+import NotFound from '@/routes/NotFound'
 
 //　ナビのコンポネントを追加
-import Navbar from '@/components/Navbar';
+import Navbar from '@/components/Navbar'
 
 export default () => {
   return (
@@ -29,5 +29,5 @@ export default () => {
         <Route path="*" element={<NotFound />} />
       </Routes>
     </div>
-  );
+  )
 }
