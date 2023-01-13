@@ -416,7 +416,9 @@ const rootElement = document.getElementById('root');
 const root = createRoot(rootElement);
 
 root.render(
-  <App />
+  <React.StrictMode>
+      <App />
+  </React.StrictMode>
 );
 ```
 
@@ -512,13 +514,50 @@ app/
 
 ### webpackの設定
 
-以下を追加
+#### フォールバックコンテンツを返す設定
 
 ```js:app/webpack.config.js
  devServer: {
         //...
         historyApiFallback: true,
     },
+```
+
+#### base url
+
+`import`が複雑になるので`src`フォルダを起点としてインポートできるようにする
+
+```js:app/webpack.config.js
+//...
+resolve: {
+        alias: {
+            '@': path.resolve(__dirname, 'src'), // 追加
+        },
+        extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
+    },
+//...
+```
+
+```json:app/tsconfig.json
+//...
+ "compilerOptions": {
+    //...
+    "baseUrl": "./",
+    "paths": {
+      "@/*": ["src/*"]
+    },
+    //...
+  },
+//...
+```
+
+使用例
+
+```jsx
+// App
+import App from '@/App';
+// css
+import '@/css/App.css';
 ```
 
 ### ルーティングの設定が行えるように`BrowserRouter`タグを設定
@@ -538,9 +577,11 @@ const root = createRoot(rootElement);
 
 root.render(
     // ルータを追加
+  <React.StrictMode>
     <BrowserRouter>
-        <App />
+      <App />
     </BrowserRouter>
+  </React.StrictMode>
 );
 ```
 
@@ -554,12 +595,13 @@ import React from 'react';
 // ルータを追加
 import { Routes, Route } from 'react-router-dom';
 //　ルートコンポネントを追加
-import Home from './routes/Home';
-import About from './routes/About';
-import Contact from './routes/Contact';
-import NotFound from './routes/NotFound';
+import Home from '@/routes/Home';
+import About from '@/routes/About';
+import Contact from '@/routes/Contact';
+import Posts from '@/routes/Posts';
+import NotFound from '@/routes/NotFound';
 //　ナビのコンポネントを追加
-import Navbar from './components/Navbar';
+import Navbar from '@/components/Navbar';
 
 export default () => {
   return (
@@ -569,6 +611,7 @@ export default () => {
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="/Posts" element={<Posts />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </div>
@@ -609,6 +652,18 @@ export default () => {
     return (
         <div>
             <h1>Contact</h1>
+        </div>
+    )
+}
+```
+
+```jsx:app/src/routes/Posts.jsx
+import React from 'react';
+
+export default () => {
+    return (
+        <div>
+            <h1>Posts</h1>
         </div>
     )
 }
@@ -669,6 +724,13 @@ export default () => {
                         to="/contact"
                     >Contact</NavLink>
                 </li>
+                <li>
+                    <NavLink
+                        style={({ isActive }) => (isActive ? activeStyle : undefined)}
+                        className={({ isActive }) => (isActive ? activeClass : undefined)}
+                        to="/posts"
+                    >Posts</NavLink>
+                </li>
             </ul>
             // 
             <button onClick={() => navigate('/')}>back to home</button>
@@ -677,41 +739,115 @@ export default () => {
 }
 ```
 
-## base url
+### Outletの設定
 
-`import`が複雑になるので`src`フォルダを起点としてインポートできるようにする
+`index.html`にbaseタグを追加
 
-```js:app/webpack.config.js
-//...
-resolve: {
-        alias: {
-            '@': path.resolve(__dirname, 'src'), // 追加
-        },
-        extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
-    },
-//...
+```html:app/dist/index.html
+<head>
+    <!-- ... -->
+    <base href="/">
+</head>
 ```
 
-```json:app/tsconfig.json
-//...
- "compilerOptions": {
-    //...
-    "baseUrl": "./",
-    "paths": {
-      "@/*": ["src/*"]
-    },
-    //...
-  },
-//...
+postコンポネントをを作成
+
+```jsx:app/src/routes/Post.jsx
+import React from 'react';
+
+export default () => {
+    return (
+        <div>
+            <h1>Post</h1>
+        </div>
+    )
+}
 ```
 
-使用例
+ネスト化するので
+postsのルーティングを設定したRouteコンポーネントの中にpostのルーティングを変更  
+絶対ルートパスの設定はできないので`path="/post"`とせずに`path="post"`のようにする 
 
-```jsx
-// App
-import App from '@/App';
-// css
-import '@/css/App.css';
+```jsx:app/src/App.jsx
+// ...
+import Post from '@/routes/Post';
+// ...
+
+  // 変更前
+  // <Route path="/Posts" element={<Posts />} />
+
+  // 変更後
+  <Route path="/posts" element={<Posts />}>
+    <Route path="post" element={<Post />} />
+  </Route>
+  // ...
 ```
 
+Postsコンポネントを編集
+
+```jsx:app/src/routes/Posts.jsx
+import React from 'react';
+import { Outlet } from 'react-router-dom';
+
+export default () => {
+    return (
+        <div>
+            <h1>Posts</h1>
+            <Outlet />
+        </div>
+    )
+}
+```
+
+`http://localhost:3000/posts/post`にアクセス
+
+### ダイナミックルーティング
+
+`App.jsx`を以下のように編集
+
+```jsx:app/src/App.jsx
+// ...
+import Post from '@/routes/Post';
+// ...
+
+  // 変更前
+  // <Route path="/posts" element={<Posts />}>
+  //   <Route path="post" element={<Post />} />
+  // </Route>
+
+  // 変更後
+  <Route path="/posts" element={<Posts />}>
+    <Route path=":postId" element={<Post />} />
+  </Route>
+  // ...
+```
+
+`Post.jsx`を以下のように編集
+
+```jsx:app/src/routes/Post.jsx
+import React from 'react';
+import { useParams } from 'react-router-dom';
+
+export default () => {
+    const params = useParams();
+    console.log(params);
+    const { postId } = useParams();
+
+    return (
+        <div>
+            <h2>Post {postId}</h2>
+        </div>
+    )
+}
+```
+
+コンソールで`{postId: 'post'}`と出ていることを確認
+
+## Ajax
+
+axiosをインストール
+
+```bash
+npm install axios
+```
 

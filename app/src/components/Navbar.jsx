@@ -36,6 +36,13 @@ export default () => {
                         to="/contact"
                     >Contact</NavLink>
                 </li>
+                <li>
+                    <NavLink
+                        style={({ isActive }) => (isActive ? activeStyle : undefined)}
+                        className={({ isActive }) => (isActive ? activeClass : undefined)}
+                        to="/posts"
+                    >Posts</NavLink>
+                </li>
             </ul>
 
             <button onClick={() => navigate('/')}>back to home</button>

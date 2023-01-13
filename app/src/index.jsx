@@ -16,7 +16,9 @@ const root = createRoot(rootElement);
 
 root.render(
     // ルータを追加
-    <BrowserRouter>
-        <App />
-    </BrowserRouter>
+    <React.StrictMode>
+        <BrowserRouter>
+            <App />
+        </BrowserRouter>
+    </React.StrictMode>
 );
