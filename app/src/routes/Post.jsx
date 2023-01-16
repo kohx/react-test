@@ -4,9 +4,6 @@ import api from '@/lib/axios/api'
 
 export default () => {
 
-    // use params
-    const params = useParams()
-
     // get id
     const { postId } = useParams()
 
@@ -15,7 +12,7 @@ export default () => {
 
     // use effect
     useEffect(() => {
-        console.log("location: ", location);
+
         // cleane
         (async () => {
             const { status, data } = await api.getPost(postId)

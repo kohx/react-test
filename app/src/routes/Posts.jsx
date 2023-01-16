@@ -5,16 +5,15 @@ import { Link } from 'react-router-dom'
 
 export default () => {
 
-    const location = useLocation()
-    const isDetailPage = location.pathname != '/posts'
-    console.log(isDetailPage);
-    
-
     const maxPage = 10
 
     // set post list state
     const [posts, setPosts] = useState([])
     const [page, setPage] = useState(1)
+    const [loading, setloading] = useState(false)
+
+    const location = useLocation()
+    const isDetailPage = location.pathname != '/posts'
 
     // if type 1
     const Message = () => {
@@ -58,8 +57,6 @@ export default () => {
         setPosts(data)
     }
 
-    const [loading, setloading] = useState(false)
-
     useEffect(() => {
 
         (async () => {
@@ -78,7 +75,7 @@ export default () => {
 
             <Outlet />
 
-            {isDetailPage ||
+            {!isDetailPage &&
 
                 <div>
                     <Message />
@@ -87,7 +84,7 @@ export default () => {
                         <div>loading...</div>
                     }
 
-                    {loading ||
+                    {!loading &&
                         <div>loaded!</div>
                     }
 

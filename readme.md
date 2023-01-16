@@ -1,9 +1,11 @@
 # Reactプロジェクトの作成
 
-## リポジトリの準備
+## プロジェクトの準備
+
+### リポジトリの準備
 github リポジトリ作成
 
-## docker desktop の設定
+### docker desktop の設定
 docker desktop 
 ↓
 settings
@@ -14,7 +16,7 @@ wsl integration
 ↓
 ubuntu-20.04 check on
 
-## ディレクトリノ準備
+### ディレクトリノ準備
 `\\wsl.localhost\Ubuntu-20.04\home\[user]`に移動
 
 ```
@@ -25,7 +27,9 @@ cd repo
 トークンの設定をしなくて良いように
 github desktopで`\\wsl.localhost\Ubuntu-20.04\home\okuda\repo\react-test`にcloneする
 
-## docker, docker-compose
+## dockerで環境を作成
+
+### フォルダ構成
 
 ```
 docker/
@@ -62,7 +66,7 @@ services:
       - "3000:3000"
 ```
 
-## docker起動
+### docker起動
 
 ```
 cd /home/[user]/repo/react-test
@@ -75,7 +79,7 @@ docker-compose up -d
 docker-compose exec web bash
 ```
 
-## WSL で デフォルトユーザを変更
+### WSL で デフォルトユーザを変更
 
 ```powershell
 
@@ -97,7 +101,9 @@ wsl -t Ubuntu-20.04
 wsl -d Ubuntu-20.04
 ```
 
-## 初期リポジトリの構成
+## プロジェクトの作成
+
+### フォルダ構成
 
 ```
 app/
@@ -117,9 +123,7 @@ app/
   └ webpack.config.js
 ```
 
-## 必要なものをインストール
-
-### リアクト関係
+### リアクト関連をインストール
 
 ```bash
 npm init
@@ -127,7 +131,7 @@ npm install react react-dom @types/react @types/react-dom
 npm install --save-dev webpack webpack-cli webpack-dev-server babel-loader @babel/core @babel/preset-env @babel/preset-react typescript ts-loader sass css-loader style-loader sass-loader
 ```
 
-### webpack
+### webpackをインストール
 
 ```bash
 touch app/webpack.config.js
@@ -304,7 +308,7 @@ resolve.extensionsに、拡張子を文字列として配列に渡すことで�
   // ...
 ```
 
-### 完成形
+#### 完成形
 
 ```js:webpack.config.js
 const path = require('path');
@@ -845,9 +849,215 @@ export default () => {
 
 ## Ajax
 
-axiosをインストール
+### フォルダ構成
+
+```
+app/
+  ├ lib/
+  │ └ axios/
+  │   ├ axios.js
+  │   └ api.js
+  │
+  └ src/
+    └ routers/
+      ├ Posts.jsx(tsx)
+      └ Post.jsx(tsx)
+```
+
+### axiosをインストール
 
 ```bash
 npm install axios
 ```
 
+### axiosの設定ファイルを作成
+
+```js:app/src/lib/axios/axios.js
+import Axios from 'axios'
+
+const axios = Axios.create({
+    // ベースURL
+    baseURL: 'https://jsonplaceholder.typicode.com',
+    // ヘッダを設定
+    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+    
+    // 自動的にクッキーをクライアントサイドに送信
+    // withCredentials: true
+})
+
+axios.interceptors.request.use(config => {
+    // something to do
+
+    return config
+})
+
+axios.interceptors.response.use(
+    response => {
+        // 成功時の処理
+
+        // レスポンス
+        return response
+    },
+    error => {
+        // 失敗時の処理
+
+        // レスポンスの形をそろえる
+        // エラー時に catch に入ってくる エラーオブジェクトは .response プロパティを持っていて、その中の response.data には API が send した内容が入っている
+        const err = error.response || error
+
+        // レスポンスの形をそろえる
+        return err
+    }
+)
+
+export {
+    axios
+}
+```
+
+### apiファイルを作成
+
+```js:app/src/lib/axios/api.js
+import { axios } from '@/lib/axios/axios'
+
+export default {
+
+　// リストを取得
+  getPosts(page = 1, limit = 10) {
+
+    const start = limit * (page - 1)
+
+    const url = `/posts/`
+
+    const data = {
+      params: {
+        _start: start,
+        _limit: limit,
+      }
+    }
+
+    return axios.get(url, data)
+  },
+
+　// アイテムを取得
+  getPost(postId) {
+    const url = `/posts/${postId}`
+    const data = {
+      params: {
+      }
+    }
+    return axios.get(url, data)
+  }
+}
+```
+
+### リストを取得する
+
+```jsx:app/src/routes/Posts.jsx
+import React, { useEffect, useState } from 'react'
+import { Outlet, useLocation } from 'react-router-dom'
+import api from '@/lib/axios/api'
+import { Link } from 'react-router-dom'
+
+export default () => {
+
+    // set post list state
+    // ポストリストのステート
+    const [posts, setPosts] = useState([])
+    // ローディングのステート
+    const [loading, setloading] = useState(false)
+
+  　// 現在のページのロケーションを取得
+    const location = useLocation()
+    // リストページか詳細ページをチェック
+    const isDetailPage = location.pathname != '/posts'
+
+    // マウント、更新、アンマウントで動作
+    useEffect(() => {
+
+        (async () => {
+            setloading(true)
+            const { status, data } = await api.getPosts()
+            setloading(false)
+
+            setPosts(data)
+        })()
+
+    }, [])
+
+    return (
+        <div>
+            <h1>Posts</h1>
+
+            <Outlet />
+
+            {/* 詳細ページ出ない場合 */}
+            {!isDetailPage &&
+
+                <div>
+                    {loading
+                        ? <div>loading...</div>
+                        : <div>loaded!</div>
+                    }
+
+                    {posts.length > 0 &&
+                        <ul>
+                            {posts.map((post) =>
+                                <li key={post.id}>
+                                    <Link
+                                        to={`${post.id}`}
+                                        // to={`/posts/${post.id}`}
+                                    >
+                                        {post.id}: {post.title}
+                                    </Link>
+                                </li>
+                            )}
+                        </ul>
+                    }
+                </div>
+            }
+        </div >
+    )
+}
+```
+
+### 詳細を取得
+
+```jsx:app/src/routes/Posts.jsx
+import React, { useEffect, useState } from 'react'
+import { useParams } from 'react-router-dom'
+import api from '@/lib/axios/api'
+
+export default () => {
+
+    // get id
+    const { postId } = useParams()
+
+    // set post state
+    const [post, setPost] = useState({})
+
+    // use effect
+    useEffect(() => {
+
+        // cleane
+        (async () => {
+            const { status, data } = await api.getPost(postId)
+            // console.log(data)
+
+            setPost(data)
+        })()
+
+    }, [postId])
+
+    return (
+        <div>
+            <h2>Post {postId}</h2>
+            <div>
+                <p>ID:{post.id}</p>
+                <p>タイトル:{post.title}</p>
+                <p>内容:{post.body}</p>
+            </div>
+        </div>
+    )
+}
+```
