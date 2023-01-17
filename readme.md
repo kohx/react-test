@@ -1061,3 +1061,199 @@ export default () => {
     )
 }
 ```
+
+## データの受け渡し Hook useReducer
+
+
+
+## データの受け渡し Hook useContext
+
+親から子、そのまた子といったように複数のコンポーネントを介してデータを渡す場合
+`useContext`を使用してシンプルにできる
+
+AppコンポネントからcreateContextでコンテキストを作成
+↓
+ContentAコンポネント
+↓
+ContentBコンポネント
+↓
+ContentC1コンポネントでuseContextで受ける
+ContentC2コンポネントで<[content].Consumer>で受ける
+ContentC3コンポネントでstateを受ける
+
+にデータを渡す
+
+### フォルダ構成
+
+```
+app/
+  └ src/
+    ├ components/
+    │ └ ContentA/
+    │  ├ ContentA.jsx
+    │  └ ContentB/
+    │  　├ ContentB.jsx
+    │  　└ ContentC/
+    │  　　├ ContentC1.jsx
+    │  　　├ ContentC2.jsx
+    │  　　└ ContentC3.jsx
+    │ 
+    └ App.jsx
+```
+
+### Appでデータを渡す
+
+```jsx:app/src/App.jsx
+// createContextを追加
+import React, { useState, createContext } from 'react'
+
+// ...
+
+// content: ContentAをインポート
+import ContentA from '@/components/contentA/ContentA'
+
+// content: createContextで`TestValue`を作成
+export const TestValue = createContext()
+
+export default () => {
+
+  return (
+    <div className="App">
+      {/* ... */}
+
+      {/* 渡す側： Providerを使う */}
+      <TestValue.Provider value={100}>
+          <ContentA />
+      </TestValue.Provider>
+
+      {/* ... */}
+    </div>
+  )
+}
+```
+
+### 間のコンポネント
+
+ContentAでContentBを表示
+
+```jsx:app/src/components/contentA/ContentA.jsx
+import React from 'react'
+import ContentB from '@/components/contentA/contentB/ContentB'
+
+export default () => {
+    return (
+        <div style={{border: '1px solid gray', padding: '10px'}}>
+            <p>ContentA</p>
+            <ContentB />
+        </div>
+    )
+}
+```
+
+ContentBでContentC1を表示
+
+```jsx:app/src/components/contentA/contentB/ContentB.jsx
+import React from 'react'
+import ContentC1 from '@/components/contentA/contentB/contentC/ContentC1'
+import ContentC2 from '@/components/contentA/contentB/contentC/ContentC2'
+import ContentC3 from '@/components/contentA/contentB/contentC/ContentC3'
+
+export default () => {
+    return (
+        <div style={{border: '1px solid gray', padding: '10px'}}>
+            <p>ContentB</p>
+            <ContentC1 />
+            <ContentC2 />
+            <ContentC3 />
+        </div>
+    )
+}
+```
+
+### ContentC1で`useContext`を使用してデータを受ける
+
+```jsx:app/src/components/contentA/contentB/contentC/ContentC1.jsx
+import React, { useContext } from 'react'
+
+// UserCountはここでimport
+import { TestValue } from '@/App'
+
+export default () => {
+
+    // UserCountを使用する場合
+    const count = useContext(TestValue)
+
+    return (
+        <div style={{border: '1px solid gray', padding: '10px'}}>
+            <p>ContentC1: {count}</p>
+        </div>
+    )
+}
+```
+
+### ContentC2で`useContext`を使用せずに`<TestValue.Consumer>`で受ける
+
+```jsx:app/src/components/contentA/contentB/contentC/ContentC2.jsx
+import React from 'react'
+
+// TestValueはここでimport
+import { TestValue } from '@/App'
+
+export default () => {
+    return (
+        <div style={{ border: '1px solid gray', padding: '10px' }}>
+
+            <TestValue.Consumer>
+                {(count) => <p>ContentC2: {count}</p>}
+            </TestValue.Consumer>
+        </div>
+    )
+}
+```
+
+### Appからsteteを渡してContentC3で`useContext`を使用して受ける
+
+```jsx:app/src/App.jsx
+import React, { useState, createContext } from 'react'
+
+// ...
+
+// content:
+import ContentA from '@/components/contentA/ContentA'
+
+// content: useContextをstateで使用する
+export const TestCount = createContext()
+
+export default () => {
+
+  // content: ステートでわたす
+  const [count, setCount] = useState(10);
+  const value = {
+    count,
+    setCount,
+  };
+
+  return (
+    <div className="App">
+      <Navbar />
+
+      {/* 渡す側をProvider */}
+      <TestCount.Provider value={value}>
+        {count}
+        <ContentA />
+      </TestCount.Provider>
+
+      {/* `Routes`タグの中に`Route`タグでパストコンポネントを追加 */}
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/posts" element={<Posts />}>
+          <Route path=":postId" element={<Post />} />
+        </Route>
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </div>
+  )
+}
+```

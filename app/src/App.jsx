@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, createContext } from 'react'
 
 // ルータを追加
 import { Routes, Route } from 'react-router-dom'
@@ -14,10 +14,36 @@ import NotFound from '@/routes/NotFound'
 //　ナビのコンポネントを追加
 import Navbar from '@/components/Navbar'
 
+// content:
+import ContentA from '@/components/contentA/ContentA'
+
+// content: useContextを使用してpropsを利用することなく異なる階層のコンポーネントとデータの共有
+export const TestValue = createContext()
+
+// content: useContextをstateで使用する
+export const TestCount = createContext()
+
 export default () => {
+
+  // content: ステートでわたす
+  const [count, setCount] = useState(10);
+  const value = {
+    count,
+    setCount,
+  };
+
   return (
     <div className="App">
       <Navbar />
+
+      {/* 渡す側をProvider */}
+      <TestValue.Provider value={100}>
+        <TestCount.Provider value={value}>
+          {count}
+          <ContentA />
+        </TestCount.Provider>
+      </TestValue.Provider>
+
       {/* `Routes`タグの中に`Route`タグでパストコンポネントを追加 */}
       <Routes>
         <Route path="/" element={<Home />} />
