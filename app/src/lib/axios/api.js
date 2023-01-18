@@ -25,5 +25,15 @@ export default {
       }
     }
     return axios.get(url, data)
+  },
+
+  getUser(userId) {
+    const url = `http://localhost:3000/json/test.json`
+    // const url = `/users/`
+    const data = {
+      params: {
+      }
+    }
+    return axios.get(url, data)
   }
 }

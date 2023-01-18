@@ -1467,13 +1467,344 @@ root.render(
 `state`の変更を行なってもブラウザ上に即座に変更が反映されない  
 `getState`関数は実行時の最新のstateの情報を取得する  
 
+```jsx:app/src/components/redux/GetState.jsx
+import React from 'react'
+import store from '@/store/index'
+
+export default () => {
+
+    const states = store.getState()
+    console.log(states)
+    const count = states.count;
+    console.log(count);
+
+    return (
+        <p>redux getState [count]:{count}</p>
+    )
+}
+```
+
 ```jsx:app/src/App.jsx
 // ...
-
-// Redux:
-import store from './store/index'
-
+import GetState from '@/components/redux/GetState'
 // ...
+export default () => {
+  // ...
+  return (
+    // ...
+      <GetState />
+    // ...
+  )
+}
+```
+
+### connect関数でstoreへアクセス 
+
+mapStateToPropsとconnectを使うデフォルトの機能でアクセス  
+`useSelector Hook`のほうが簡単にかける
+
+`connect`には引数として`mapStateToProps`関数を指定  
+`mapStateToProps`関数では`store`の中で設定したstateを
+Appコンポーネントにデータを渡せるpropsへと変換(map)する  
+
+`mapStateToProps`関数の中では`state`のどの値を`props`としてコンポーネントに渡すのか設定することがでる  
+
+```jsx:app/src/components/redux/ConnectAndMapStateToProps.jsx
+import React from 'react'
+import { connect } from "react-redux"
+
+// Redux: mapStateToProps関数
+const mapStateToProps = (state) => {
+    return { count: state.count }
+}
+
+const ConnectAndMapStateToProps = ({ count }) => {
+    return (
+        <div style={{border: '1px solid gray', padding: '10px'}}>
+            redux connect mapStateToProps [count]: {count}
+        </div>
+    )
+}
+
+// Redux: connect関数
+export default connect(mapStateToProps)(ConnectAndMapStateToProps)
+```
+
+```jsx:app/src/App.jsx
+// ...
+import ConnectAndMapStateToProps from '@/components/redux/ConnectAndMapStateToProps'
+// ...
+export default () => {
+  // ...
+  return (
+    // ...
+      <ConnectAndMapStateToProps />
+    // ...
+  )
+}
+```
+
+### useSelector Hooksでstoreへアクセス
+
+Aboutコンポネントでアクセスする
+```jsx:app/src/components/redux/UseSelectorHooks.jsx
+import React from 'react'
+import { useSelector } from "react-redux";
+
+export default () => {
+
+    const count = useSelector((state) => state.count)
+
+    return (
+        <div style={{border: '1px solid gray', padding: '10px'}}>
+            redux useSelector hooks [count]:{count}
+        </div>
+    )
+}
+```
+
+```jsx:app/src/App.jsx
+// ...
+import ConnectAndMapStateToProps from '@/components/redux/ConnectAndMapStateToProps'
+// ...
+export default () => {
+  // ...
+  return (
+    // ...
+      <ConnectAndMapStateToProps />
+    // ...
+  )
+}
+```
+
+### ストアの追加と分割
+
+エントリーストアを追加して、ストアをそれぞれのファイルに分割して作成
+`combineReducers`でストアを統合
+
+#### カウントストアを作成 　
+
+```js:app/src/store/countReducer.js
+export default (
+    state = {
+      count: 50,
+    }
+  ) => {
+    return state
+  }
+```
+
+#### エントリーストアを作成
+
+```js:app/src/store/entriesReducer.js
+export default (
+  state = {
+    entries: [
+      { id: 1, title: 'エントリー１' },
+      { id: 2, title: 'エントリー２' },
+    ],
+  }
+) => {
+  return state
+};
+```
+
+#### ストアインデックスを書き換え
+
+```js:app/src/store/index.js
+import countReducer from "@/store/countReducer";
+import entriesReducer from "@/store/entriesReducer";
+import { createStore, combineReducers } from 'redux';
+
+const rootReducer = combineReducers({
+    countReducer,
+    entriesReducer,
+})
+
+// Rudex: ストアの作成
+const store = createStore(rootReducer);
+
+export default store;
+```
+
+#### ストアの値を変更
+
+```jsx:app/src/components/redux/GetState.jsx
+// ...
+    // const count = states.count ↓ 変更
+    const count = states.countReducer.count
+// ...
+```
+
+```jsx:app/src/components/redux/ConnectAndMapStateToProps.jsx
+// ...
+    // return { count: state.count } ↓ 変更
+    return { count: state.countReducer.count }
+// ...
+
+```
+
+```jsx:app/src/components/redux/UseSelectorHooks.jsx
+// ...
+    // const count = useSelector((state) => state.count) ↓ 変更
+    const count = useSelector((state) => state.countReducer.count)
+
+    // 追加
+    const entries = useSelector((state) => state.entriesReducer.entries);
+
+    return (
+        <div style={{ border: '1px solid gray', padding: '10px' }}>
+            <div>redux useSelector hooks [count]:{count}</div>
+            <div>redux useSelector hooks [entries]:
+                <ul>
+                    {entries.map((entry) => (
+                        <li key={entry.id}>{entry.title}</li>
+                    ))}
+                </ul>
+            </div>
+        </div>
+    )
+// ...
+```
+
+### ストアの更新
+
+`reducer`は`state`と`action`を引数にとることができる  
+`action`の内容により新しい`state`を戻す
+
+#### action を追加
+
+```js:app/src/store/countReducer.js
+export default (
+    state = {
+      count: 50,
+    },
+    action // 追加
+  ) => {
+    // 変更
+    switch (action.type) {
+      case 'INCREASE_COUNT':
+        return {
+          count: state.count + 1,
+        };
+      case 'DECREASE_COUNT':
+        return {
+          count: state.count - 1,
+        };
+      default:
+        return state;
+    }
+  }
+```
+
+#### connect mapStateToPropsの場合
+
+```jsx:app/src/components/redux/ConnectAndMapStateToProps.jsx
+import React from 'react'
+import { connect } from "react-redux"
+
+// Redux: mapStateToProps関数
+const mapStateToProps = (state) => {
+    return { count: state.countReducer.count }
+}
+
+// Redux: mapDispatchToProps関数 追加
+const mapDispatchToProps = (dispatch) => {
+    return {
+        increase: () => dispatch({ type: "INCREASE_COUNT" }),
+        decrease: () => dispatch({ type: "DECREASE_COUNT" }),
+    }
+}
+
+// App
+const ConnectAndMapStateToProps = ({ count, increase, decrease }) => {
+    return (
+        <div style={{ border: '1px solid gray', padding: '10px' }}>
+            redux connect mapStateToProps [count]: {count}
+            {/* 追加 */}
+            <button onClick={increase}>Up</button>
+            <button onClick={decrease}>Down</button>
+        </div>
+    )
+}
+
+// Redux: connect関数
+export default connect(mapStateToProps, mapDispatchToProps)(ConnectAndMapStateToProps);
+
+```
+
+#### useSelector Hooksの場合
+
+```jsx:app/src/components/redux/UseSelectorHooks.jsx
+import React from 'react'
+// useDispatchを追加
+import { useSelector, useDispatch } from "react-redux";
+
+export default () => {
+
+    const count = useSelector((state) => state.countReducer.count)
+
+    // 追加
+    const dispatch = useDispatch();
+
+    // 追加
+    const increase = () => {
+        dispatch({ type: "INCREASE_COUNT" })
+    }
+
+    // 追加
+    const decrease = () => {
+        dispatch({ type: "DECREASE_COUNT" })
+    }
+
+    const entries = useSelector((state) => state.entriesReducer.entries)
+
+    return (
+        <div style={{ border: '1px solid gray', padding: '10px' }}>
+            <div>
+                redux useSelector hooks [count]:{count}
+                {/* 追加 */}
+                <button onClick={increase}>Up</button>
+                <button onClick={decrease}>Down</button>
+            </div>
+            <div>redux useSelector hooks [entries]:
+                <ul>
+                    {entries.map((entry) => (
+                        <li key={entry.id}>{entry.title}</li>
+                    ))}
+                </ul>
+            </div>
+        </div>
+    )
+}
+```
+
+### ストアの非同期の処理
+
+```js:app/src/store/userReducer.js
+export default (
+    state = {
+      user: [],
+    },
+    action
+  ) => {
+    switch (action.type) {
+      case 'GET_POST_DATA':
+        // stateにpayloadの値を設定
+        return { ...state, user: action.payload }
+      default:
+        return state;
+    }
+  }
+```
+
+```jsx:app/src/App.jsx
+// ...
+// import React, { useState, createContext } from 'react'
+import React, { useState, useEffect, createContext } from 'react'
+
+// Redux 非同期:
+import { useSelector, useDispatch } from 'react-redux';
 
 export default () => {
 
@@ -1493,143 +1824,3 @@ export default () => {
     )
 }
 ```
-
-### connect関数でstoreへアクセス 
-
-mapStateToPropsとconnectを使うデフォルトの機能でアクセス  
-`useSelector Hook`のほうが簡単にかける
-
-`connect`には引数として`mapStateToProps`関数を指定  
-`mapStateToProps`関数では`store`の中で設定したstateを
-Appコンポーネントにデータを渡せるpropsへと変換(map)する  
-
-`mapStateToProps`関数の中では`state`のどの値を`props`としてコンポーネントに渡すのか設定することがでる  
-
-Homeコンポネントでアクセスする
-```jsx:app/src/Home.jsx
-import React from 'react'
-
-// Redux:
-import store from '@/store/index'
-import { connect } from "react-redux"
-
-// Redux: mapStateToProps関数
-const mapStateToProps = (state) => {
-    return { reduxCount: state.count }
-}
-
-const Home = ({ reduxCount }) => {
-    return (
-        <div>
-            <h1>Home</h1>
-            <p>redux count (connect mapStateToProps): {reduxCount}</p>
-        </div>
-    )
-}
-
-// Redux: connect関数
-export default connect(mapStateToProps)(Home)
-```
-
-### useSelector Hooksでstoreへアクセス
-
-Aboutコンポネントでアクセスする
-```jsx:app/src/routes/Home.jsx
-import React from 'react'
-
-// Redux: useSelector
-import { useSelector } from "react-redux";
-
-export default () => {
-
-    // Redux: useSelectorでアクセス
-    const reduxCount = useSelector((state) => state.count);
-
-    return (
-        <div>
-            <h1>About</h1>
-            <p>redux count (useSelector): {reduxCount}</p>
-        </div>
-    )
-}
-```
-
-### ストアを分割
-
-ストアを分割しそれぞれのファイルを作成
-`combineReducers`でストアを統合
-
-カウントストアを作成 　
-```jsx:app/src/store/countReducer.js
-export default (
-    state = {
-      count: 50,
-    }
-  ) => {
-    return state
-  }
-```
-
-ポストストアを作成  
-```jsx:app/src/store/postsReducer.js
-export default (
-    state = {
-      posts: [
-        { id: 1, title: 'Reduxについて' },
-        {
-          id: 2,
-          title: 'ReduxのHooksについて',
-        },
-      ],
-    }
-  ) => {
-    return state
-  };
-```
-
-ストアインデックスを書き換え
-```jsx:app/src/store/index.js
-import countReducer from "@/store/countReducer"
-import postsReducer from "@/store/postsReducer"
-import { createStore, combineReducers } from 'redux'
-
-const rootReducer = combineReducers({
-    countReducer,
-    postsReducer,
-})
-
-// Rudex: ストアの作成
-const store = createStore(rootReducer)
-console.log(store.getState())
-
-export default store
-```
-
-ストアの値を変更
-```jsx:app/src/App.jsx
-// ...
-    // <p>redux count (getState):{store.getState().count}</p>
-    <p>redux count (getState):{store.getState().countReducer.count}</p>
-// ...
-```
-
-```jsx:app/src/routes/Home.jsx
-// ...
-const mapStateToProps = (state) => {
-    // return { reduxCount: state.count }
-    // return { reduxCount: state.countReducer.count }
-}
-// ...
-
-```
-
-```jsx:app/src/routes/Home.jsx
-// ...
-    // const reduxCount = useSelector((state) => state.count);
-    const reduxCount = useSelector((state) => state.postsReducer.count);
-    // const posts = useSelector((state) => state.posts);
-    const posts = useSelector((state) => state.postsReducer.posts);
-// ...
-```
-
-### ストア

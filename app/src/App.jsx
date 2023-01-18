@@ -1,4 +1,4 @@
-import React, { useState, createContext } from 'react'
+import React, { useState, useEffect, createContext } from 'react'
 
 // ルータを追加
 import { Routes, Route } from 'react-router-dom'
@@ -21,7 +21,15 @@ import ContentA from '@/components/contentA/ContentA'
 import Counter from '@/components/reducer/Counter'
 
 // Redux:
+import GetState from '@/components/redux/GetState'
+import ConnectAndMapStateToProps from '@/components/redux/ConnectAndMapStateToProps'
+import UseSelectorHooks from '@/components/redux/UseSelectorHooks'
+
 import store from '@/store/index'
+
+// Redux 非同期:
+import { useSelector, useDispatch } from 'react-redux';
+import api from '@/lib/axios/api'
 
 // content: useContextを使用してpropsを利用することなく異なる階層のコンポーネントとデータの共有
 export const TestValue = createContext()
@@ -38,14 +46,31 @@ export default () => {
     setCount,
   };
 
-  // Redux:
-  console.log(store.getState());
+  // Redux 非同期:
+  // const userId = 2
+  // const dispatch = useDispatch();
+  // const user = useSelector((state) => state.userReducer.user);
+
+  // useEffect(() => {
+  //   // cleane
+  //   (async () => {
+  //     const { status, data } = await api.getUser(userId)
+  //     // console.log(data);
+
+  //     dispatch({
+  //       type: 'GET_POST_DATA',
+  //       payload: data,
+  //     })
+
+  //     // console.log(asdf.name);
+
+  //   })()
+  // }, [userId])
 
   return (
     <div className="App">
-      <Navbar />
 
-      <p>redux count (getState):{store.getState().countReducer.count}</p>
+      <Navbar />
 
       <Counter />
 
@@ -56,6 +81,13 @@ export default () => {
           <ContentA />
         </TestCount.Provider>
       </TestValue.Provider>
+
+      <br />
+      <GetState />
+      <br />
+      <ConnectAndMapStateToProps />
+      <br />
+      <UseSelectorHooks />
 
       {/* `Routes`タグの中に`Route`タグでパストコンポネントを追加 */}
       <Routes>
