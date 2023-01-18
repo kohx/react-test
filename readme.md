@@ -1064,7 +1064,133 @@ export default () => {
 
 ## データの受け渡し Hook useReducer
 
+`useReducer` が `useState` より適しているのは以下の様な場合
+- 複数の値にまたがる複雑な state ロジック  
+- 前のstate に基づいて次の state を決める必要がある
 
+### カウンタコンポネントを作成
+
+カウンタコンポネントをインポート
+```jsx:app/src/App.jsx
+import Counter from '@/components/reducer/Counter'
+
+// ...
+
+export default () => {
+  // ...
+  return (
+    <div className="App">
+      {/* ... */}
+
+      <Counter />
+
+      {/* ... */}
+    </div>
+  )
+}
+```
+
+カウンタコンポネントを作成
+```jsx:app/src/components/reducer/Counter.jsx
+// useReducerを追加
+import React, { useReducer } from 'react'
+
+// 初期値を設定
+const initialState = {
+    count: 0
+}
+
+// ステートとアクションを受ける関数
+const reducer = (state, action) => {
+
+    switch (action) {
+        case 'INCREMENT':
+            return { count: state.count + 1 }
+        case 'DECREMENT':
+            return { count: state.count - 1 }
+        case 'DOUBLE_INCRE':
+            return { count: state.count * 2 }
+        case 'RESET':
+            return { count: 0 }
+        default:
+            return state
+    }
+}
+
+export default () => {
+
+    // 関数と初期値を渡してステートとディスパッチ関数を作成
+    const [state, dispatch] = useReducer(reducer, initialState)
+
+    return (
+        <div style={{ border: '1px solid gray', padding: '10px' }}>
+            <h2>count: {state.count}</h2>
+            <button onClick={() => dispatch('DECREMENT')}>-</button>
+            <button onClick={() => dispatch('INCREMENT')}>+</button>
+            <button onClick={() => dispatch('DOUBLE_INCRE')}>++</button>
+            <button onClick={() => dispatch('RESET')}>0</button>
+        </div>
+    );
+}
+```
+
+### Actionにtypeとpayloadを渡す
+
+`dispatch('INCREMENT')` のように渡していたアクションを
+以下のようにオブジェクトで`type`と`payload`を渡す  
+`{type: 'INCREMENT', payload: 5})` 
+
+```jsx:app/src/components/reducer/Counter.jsx
+// useReducerを追加
+import React, { useReducer } from 'react'
+
+// 初期値を設定
+const initialState = {
+    count: 0
+}
+
+// ステートとアクションを受ける関数
+const reducer = (state, action) => {
+
+    // switch (action) {
+    switch (action.type) {
+        case 'INCREMENT':
+            // return { count: state.count + 1 }
+            return {count: state.count + action.payload}
+        case 'DECREMENT':
+            // return { count: state.count - 1 }
+            return {count: state.count - action.payload}
+        case 'DOUBLE_INCRE':
+            return { count: state.count * 2 }
+        case 'RESET':
+            return { count: 0 }
+        default:
+            return state
+    }
+}
+
+export default () => {
+
+    // 関数と初期値を渡してステートとディスパッチ関数を作成
+    const [state, dispatch] = useReducer(reducer, initialState)
+
+    return (
+        <div style={{ border: '1px solid gray', padding: '10px' }}>
+            <h2>count: {state.count}</h2>
+            {/* `dispatch`でアクションを渡す */}
+            
+            {/* <button onClick={() => dispatch('DECREMENT')}>-</button> */}
+            <button onClick={() => dispatch({type: 'DECREMENT', payload: 5})}>-</button>
+            {/* <button onClick={() => dispatch('INCREMENT')}>+</button> */}
+            <button onClick={() => dispatch({type: 'INCREMENT', payload: 5})}>+</button>
+            {/* <button onClick={() => dispatch('DOUBLE_INCRE')}>++</button> */}
+            <button onClick={() => dispatch({type: 'DOUBLE_INCRE'})}>++</button>
+            {/* <button onClick={() => dispatch('RESET')}>0</button> */}
+            <button onClick={() => dispatch({type: 'RESET'})}>0</button>
+        </div>
+    );
+}
+```
 
 ## データの受け渡し Hook useContext
 

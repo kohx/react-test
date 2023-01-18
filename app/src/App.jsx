@@ -17,6 +17,9 @@ import Navbar from '@/components/Navbar'
 // content:
 import ContentA from '@/components/contentA/ContentA'
 
+// reducer:
+import Counter from '@/components/reducer/Counter'
+
 // content: useContextを使用してpropsを利用することなく異なる階層のコンポーネントとデータの共有
 export const TestValue = createContext()
 
@@ -35,6 +38,8 @@ export default () => {
   return (
     <div className="App">
       <Navbar />
+
+      <Counter />
 
       {/* 渡す側をProvider */}
       <TestValue.Provider value={100}>
