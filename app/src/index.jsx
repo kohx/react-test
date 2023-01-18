@@ -14,11 +14,19 @@ import '@/css/Sanitize.css'
 const rootElement = document.getElementById('root')
 const root = createRoot(rootElement)
 
+// Providerをインポート
+import { Provider } from "react-redux"
+
+// storeをインポート
+import store from '@/store/index'
+
 root.render(
     // ルータを追加
-    <React.StrictMode>
-        <BrowserRouter>
-            <App />
-        </BrowserRouter>
-    </React.StrictMode>
+    <Provider store={store}>
+        <React.StrictMode>
+            <BrowserRouter>
+                <App />
+            </BrowserRouter>
+        </React.StrictMode>
+    </Provider>
 )

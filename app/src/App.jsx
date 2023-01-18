@@ -20,6 +20,9 @@ import ContentA from '@/components/contentA/ContentA'
 // reducer:
 import Counter from '@/components/reducer/Counter'
 
+// Redux:
+import store from '@/store/index'
+
 // content: useContextを使用してpropsを利用することなく異なる階層のコンポーネントとデータの共有
 export const TestValue = createContext()
 
@@ -29,15 +32,20 @@ export const TestCount = createContext()
 export default () => {
 
   // content: ステートでわたす
-  const [count, setCount] = useState(10);
+  const [count, setCount] = useState(10)
   const value = {
     count,
     setCount,
   };
 
+  // Redux:
+  console.log(store.getState());
+
   return (
     <div className="App">
       <Navbar />
+
+      <p>redux count (getState):{store.getState().countReducer.count}</p>
 
       <Counter />
 
