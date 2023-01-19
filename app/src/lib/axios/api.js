@@ -35,5 +35,16 @@ export default {
       }
     }
     return axios.get(url, data)
+
+    // * redux-thunk
+    // return async (dispatch) => {
+    //   const url = `/users/${userId}`
+    //   const { status, data } = await axios.get(url)
+
+    //   dispatch({
+    //     type: 'GET_POST_DATA',
+    //     payload: data,
+    //   });
+    // }
   }
 }

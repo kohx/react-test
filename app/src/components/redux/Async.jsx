@@ -8,23 +8,23 @@ export default () => {
     const userId = 2
     const dispatch = useDispatch();
     const user = useSelector((state) => state.userReducer.user);
-    
 
     useEffect(() => {
         // cleane
         (async () => {
             const { status, data } = await api.getUser(userId)
-            // console.log(data);
-
             dispatch({
                 type: 'GET_POST_DATA',
                 payload: data,
             })
 
-            console.log(user);
-
         })()
     }, [userId])
+
+    // * redux-thunk
+    // useEffect(() => {
+    //     dispatch(api.getUser(userId, dispatch))
+    // }, [userId, dispatch])
 
     return (
         <div style={{ border: '1px solid gray', padding: '10px' }}>

@@ -1918,3 +1918,20 @@ export default () => {
     )
 }
 ```
+
+### Redux DevTools
+
+Chromeに拡張機能を追加
+[Redux DevTools](https://chrome.google.com/webstore/detail/redux-devtools/lmhkpmbekcpmknklioeibfkpmmfibljd?hl=ja)
+
+```jsx:app/src/store/index.js
+// ...
+// const store = createStore(reducer) ↓ 書き換え
+const store = createStore(
+    reducer,
+    window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
+  );
+// ...
+```
+
+### redux-thunk
