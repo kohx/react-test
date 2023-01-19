@@ -24,12 +24,7 @@ import Counter from '@/components/reducer/Counter'
 import GetState from '@/components/redux/GetState'
 import ConnectAndMapStateToProps from '@/components/redux/ConnectAndMapStateToProps'
 import UseSelectorHooks from '@/components/redux/UseSelectorHooks'
-
-import store from '@/store/index'
-
-// Redux 非同期:
-import { useSelector, useDispatch } from 'react-redux';
-import api from '@/lib/axios/api'
+import Async from '@/components/redux/Async'
 
 // content: useContextを使用してpropsを利用することなく異なる階層のコンポーネントとデータの共有
 export const TestValue = createContext()
@@ -46,29 +41,10 @@ export default () => {
     setCount,
   };
 
-  // Redux 非同期:
-  // const userId = 2
-  // const dispatch = useDispatch();
-  // const user = useSelector((state) => state.userReducer.user);
-
-  // useEffect(() => {
-  //   // cleane
-  //   (async () => {
-  //     const { status, data } = await api.getUser(userId)
-  //     // console.log(data);
-
-  //     dispatch({
-  //       type: 'GET_POST_DATA',
-  //       payload: data,
-  //     })
-
-  //     // console.log(asdf.name);
-
-  //   })()
-  // }, [userId])
-
   return (
     <div className="App">
+
+      <Async />
 
       <Navbar />
 

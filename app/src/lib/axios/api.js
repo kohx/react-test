@@ -28,8 +28,8 @@ export default {
   },
 
   getUser(userId) {
-    const url = `http://localhost:3000/json/test.json`
-    // const url = `/users/`
+    // const url = `http://localhost:3000/json/test.json`
+    const url = `/users/${userId}`
     const data = {
       params: {
       }

@@ -1781,46 +1781,140 @@ export default () => {
 
 ### ストアの非同期の処理
 
+#### ユーザストアの作成
+
 ```js:app/src/store/userReducer.js
 export default (
-    state = {
-      user: [],
-    },
-    action
-  ) => {
-    switch (action.type) {
-      case 'GET_POST_DATA':
-        // stateにpayloadの値を設定
-        return { ...state, user: action.payload }
-      default:
-        return state;
-    }
+  state = {
+    user: {},
+  },
+  action
+) => {
+  switch (action.type) {
+    case 'GET_POST_DATA':
+      console.log(state);
+
+      return { ...state, user: action.payload };
+    default:
+      return state;
   }
+}
 ```
 
-```jsx:app/src/App.jsx
-// ...
-// import React, { useState, createContext } from 'react'
-import React, { useState, useEffect, createContext } from 'react'
+```js:app/src/store/userReducer.js
+import countReducer from "@/store/countReducer";
+import entriesReducer from "@/store/entriesReducer";
+// 追加
+import userReducer from "@/store/userReducer";
 
-// Redux 非同期:
-import { useSelector, useDispatch } from 'react-redux';
+import { createStore, combineReducers } from 'redux';
+
+const rootReducer = combineReducers({
+    countReducer,
+    entriesReducer,
+    // 追加
+    userReducer,
+})
+
+// Rudex: ストアの作成
+const store = createStore(rootReducer);
+
+export default store;
+```
+
+#### Asyncコンポネントの作成
+
+```js:app/src/lib/axios/api.js
+// ...
+export default {
+  // ...
+  getUser(userId) {
+    // const url = `http://localhost:3000/json/test.json`
+    const url = `/users/${userId}`
+    const data = {
+      params: {
+      }
+    }
+    return axios.get(url, data)
+  }
+  // ...
+}
+```
+
+```jsx:app/src/components/redux/Async.jsx
+import React, { useEffect } from 'react'
+import { useSelector, useDispatch } from "react-redux";
+import api from "@/lib/axios/api"
 
 export default () => {
 
+    // Redux 非同期:
+    const userId = 2
+    const dispatch = useDispatch();
+    const user = useSelector((state) => state.userReducer.user);
+    
+
+    useEffect(() => {
+        // cleane
+        (async () => {
+            const { status, data } = await api.getUser(userId)
+            // console.log(data);
+
+            dispatch({
+                type: 'GET_POST_DATA',
+                payload: data,
+            })
+
+            console.log(user);
+
+        })()
+    }, [userId])
+
+    return (
+        <div style={{ border: '1px solid gray', padding: '10px' }}>
+            <p>Welcome! {user.id}:{user.name}</p>
+        </div>
+    )
+}
+```
+
+```jsx:app/src/Async.jsx
+// ...
+import Async from '@/components/redux/Async'
+// ...
+export default () => {
   // ...
-
-  // Redux:
-  console.log(store.getState());
-
   return (
-      <div className="App">
+    // ...
+      <Async />
+    // ...
+  )
+}
+```
 
-      {/* ... */}
+#### 他のコンポネントでも取得
 
-        <p>redux count:{store.getState().count}</p>
+```jsx:app/src/routes/Home.jsx
+import React from 'react'
+import { useSelector } from "react-redux";
 
-      {/* ... */}
+export default () => {
+
+    const user = useSelector((state) => state.userReducer.user)    
+
+    return (
+        <div>
+            <h1>Home</h1>
+            <ul>
+                <li>id: {user.id}</li>
+                <li>name: {user.name}</li>
+                <li>email: {user.email}</li>
+                <li>phone: {user.phone}</li>
+                <li>website: {user.website}</li>
+                <li>address: {user.address?.zipcode} {user.address?.street} {user.address?.suite} {user.address?.city}</li>
+                <li>geo: {user.address?.geo.lat},{user.address?.geo.lng}</li>
+            </ul>
+        </div>
     )
 }
 ```
