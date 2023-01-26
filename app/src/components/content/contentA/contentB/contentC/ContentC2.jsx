@@ -1,6 +1,7 @@
 import React from 'react'
+
 // TestValueはここでimport
-import { TestValue } from '@/App'
+import { TestValue } from '@/components/content/Content'
 
 export default () => {
     return (

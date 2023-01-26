@@ -1,5 +1,5 @@
 import React from 'react'
-import ContentB from '@/components/contentA/contentB/ContentB'
+import ContentB from '@/components/content/contentA/contentB/ContentB'
 
 export default () => {
     return (

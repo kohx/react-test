@@ -27,7 +27,7 @@ export default () => {
     // }, [userId, dispatch])
 
     return (
-        <div style={{ border: '1px solid gray', padding: '10px' }}>
+        <div style={{ borderBlockEnd: '1px solid steelblue', padding: '10px' }}>
             <p>Welcome! {user.id}:{user.name}</p>
         </div>
     )

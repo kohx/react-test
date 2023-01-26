@@ -33,7 +33,7 @@ export default () => {
 
     return (
         <div style={{ border: '1px solid gray', padding: '10px' }}>
-            <h2>count: {state.count}</h2>
+            <h2>count up: {state.count}</h2>
             {/* `dispatch`でアクションを渡す */}
             
             {/* <button onClick={() => dispatch('DECREMENT')}>-</button> */}

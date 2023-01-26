@@ -1,7 +1,7 @@
 import React, { useContext } from 'react'
 
-// UserCountはここでimport
-import { TestValue } from '@/App'
+// TestValueはここでimport
+import { TestValue } from '@/components/content/Content'
 
 export default () => {
 

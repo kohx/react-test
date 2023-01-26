@@ -43,6 +43,41 @@ export default () => {
                         to="/posts"
                     >Posts</NavLink>
                 </li>
+                <li>
+                    <NavLink
+                        style={({ isActive }) => (isActive ? activeStyle : undefined)}
+                        className={({ isActive }) => (isActive ? activeClass : undefined)}
+                        to="/test1"
+                    >Test1</NavLink>
+                </li>
+                <li>
+                    <NavLink
+                        style={({ isActive }) => (isActive ? activeStyle : undefined)}
+                        className={({ isActive }) => (isActive ? activeClass : undefined)}
+                        to="/test2"
+                    >Test2</NavLink>
+                </li>
+                <li>
+                    <NavLink
+                        style={({ isActive }) => (isActive ? activeStyle : undefined)}
+                        className={({ isActive }) => (isActive ? activeClass : undefined)}
+                        to="/test3"
+                    >Test3</NavLink>
+                </li>
+                <li>
+                    <NavLink
+                        style={({ isActive }) => (isActive ? activeStyle : undefined)}
+                        className={({ isActive }) => (isActive ? activeClass : undefined)}
+                        to="/test4"
+                    >Test4</NavLink>
+                </li>
+                <li>
+                    <NavLink
+                        style={({ isActive }) => (isActive ? activeStyle : undefined)}
+                        className={({ isActive }) => (isActive ? activeClass : undefined)}
+                        to="/test5"
+                    >Test5</NavLink>
+                </li>
             </ul>
 
             <button onClick={() => navigate('/')}>back to home</button>

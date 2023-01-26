@@ -1,6 +1,7 @@
 import React, { useContext } from 'react'
+
 // TestCountはここでimport
-import { TestCount } from '@/App'
+import { TestCount } from '@/components/content/Content'
 
 export default () => {
 

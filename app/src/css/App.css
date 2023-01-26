@@ -1,5 +1,6 @@
 .nav-bar {
     padding: 10px;
+    border-block-end: 1px solid steelblue;
 }
 .nav-bar__list {
     display: flex;
