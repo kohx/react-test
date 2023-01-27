@@ -6,7 +6,7 @@ export default (
 ) => {
   switch (action.type) {
     case 'GET_POST_DATA':
-      console.log(state);
+      // console.log(state);
 
       return { ...state, user: action.payload };
     default:

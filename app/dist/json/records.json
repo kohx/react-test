@@ -1,0 +1,92 @@
+[
+   {
+      "model": "1",
+      "price": 100,
+      "date": "2023-01-02 00:00:00",
+      "photo": "",
+      "condition": "New",
+      "color": "#9c27b0",
+      "available": true
+   },
+   {
+      "model": "2",
+      "price": 120,
+      "date": "2023-01-02 00:00:00",
+      "photo": "",
+      "condition": "New",
+      "color": "#9c27b0",
+      "available": true
+   },
+   {
+      "model": "3",
+      "price": 130,
+      "date": "2023-01-02 00:00:00",
+      "photo": "",
+      "condition": "New",
+      "color": "#9c27b0",
+      "available": true
+   },
+   {
+      "model": "4",
+      "price": 140,
+      "date": "2023-01-02 00:00:00",
+      "photo": "",
+      "condition": "New",
+      "color": "#9c27b0",
+      "available": true
+   },
+   {
+      "model": "5",
+      "price": 150,
+      "date": "2023-01-02 00:00:00",
+      "photo": "",
+      "condition": "New",
+      "color": "#9c27b0",
+      "available": true
+   },
+   {
+      "model": "6",
+      "price": 160,
+      "date": "2023-01-02 00:00:00",
+      "photo": "",
+      "condition": "New",
+      "color": "#9c27b0",
+      "available": true
+   },
+   {
+      "model": "7",
+      "price": 170,
+      "date": "2023-01-02 00:00:00",
+      "photo": "",
+      "condition": "New",
+      "color": "#9c27b0",
+      "available": true
+   },
+   {
+      "model": "8",
+      "price": 180,
+      "date": "2023-01-02 00:00:00",
+      "photo": "",
+      "condition": "New",
+      "color": "#9c27b0",
+      "available": true
+   },
+   {
+      "model": "9",
+      "price": 190,
+      "date": "2023-01-02 00:00:00",
+      "photo": "",
+      "condition": "New",
+      "color": "#9c27b0",
+      "available": true
+   },
+   {
+      "model": "10",
+      "price": 200,
+      "date": "2023-01-02 00:00:00",
+      "photo": "",
+      "condition": "New",
+      "color": "#9c27b0",
+      "available": true
+   }
+]

@@ -46,5 +46,14 @@ export default {
     //     payload: data,
     //   });
     // }
+  },
+
+  getRecords(data = null) {
+    const url = `http://localhost:3000/json/records.json`
+    return axios.get(url, data)
+  },
+  getColumns(data = null) {
+    const url = `http://localhost:3000/json/columns.json`
+    return axios.get(url, data)
   }
 }

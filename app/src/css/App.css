@@ -2,9 +2,55 @@
     padding: 10px;
     border-block-end: 1px solid steelblue;
 }
+
 .nav-bar__list {
     display: flex;
     align-items: center;
     gap: 10px;
     list-style: none;
+}
+
+.j-sort,
+.j-filter {
+    display: inline-block;
+    border: 1px solid steelblue;
+    width: 1.4rem;
+    height: 1.4rem;
+    border-radius: 2px;
+    margin-inline-start: 5px;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+.j-list {
+    border: 1px solid steelblue;
+    border-block-end: none;
+    position: absolute;
+    z-index: 1000;
+    background-color: white;
+    display: none;
+    
+}
+
+.j-list--active {
+    display: block;
+}
+
+.j-list ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.j-list ul li {
+    padding-inline: 1rem;
+    padding-block: 0.2rem;
+    border-block-end: 1px solid steelblue;
+    cursor: pointer;
+}
+
+.j-list ul li:hover {
+    background-color: lightblue;
 }
