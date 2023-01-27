@@ -24,33 +24,39 @@
     position: relative;
 }
 
-.j-list {
-    border: 1px solid steelblue;
+.j-wrap {
     border-block-end: none;
     position: absolute;
     z-index: 1000;
     background-color: white;
+    inset-block-start: calc(100% + 5px);
+    inset-inline-start: 0;
     display: none;
-    
 }
 
-.j-list--active {
-    display: block;
-}
-
-.j-list ul {
+.j-list {
+    border: 1px solid steelblue;
+    border-block-end: none;
     list-style: none;
     padding: 0;
     margin: 0;
 }
 
-.j-list ul li {
+.j-item {
     padding-inline: 1rem;
     padding-block: 0.2rem;
     border-block-end: 1px solid steelblue;
     cursor: pointer;
 }
 
-.j-list ul li:hover {
+.j-item:hover {
     background-color: lightblue;
+}
+
+table.jexcel>thead>tr>td {
+    overflow: visible;
+}
+
+div.jexcel_content {
+    overflow: visible !important;
 }
