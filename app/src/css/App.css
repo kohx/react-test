@@ -25,7 +25,7 @@
 }
 
 .j-wrap {
-    border-block-end: none;
+    border: 1px solid steelblue;
     position: absolute;
     z-index: 1000;
     background-color: white;
@@ -35,18 +35,22 @@
 }
 
 .j-list {
-    border: 1px solid steelblue;
-    border-block-end: none;
     list-style: none;
     padding: 0;
     margin: 0;
+    max-height: 200px;
+    overflow-y: auto;
 }
 
 .j-item {
-    padding-inline: 1rem;
-    padding-block: 0.2rem;
-    border-block-end: 1px solid steelblue;
-    cursor: pointer;
+}
+.j-label {
+    display: block;
+    text-align: start;
+    padding-inline: 0.3rem;
+}
+.j-check {
+    margin-inline-end: 0.3rem;
 }
 
 .j-item:hover {
@@ -55,8 +59,4 @@
 
 table.jexcel>thead>tr>td {
     overflow: visible;
-}
-
-div.jexcel_content {
-    overflow: visible !important;
 }

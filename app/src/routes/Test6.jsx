@@ -36,7 +36,7 @@ export default () => {
     useEffect(() => {
         const handleOutside = (event) => {
             const target = event.target
-            if (!(target.classList.contains('j-filter') || target.classList.contains('j-item'))) {
+            if (!(target.classList.contains('j-filter') || target.classList.contains('j-item') || target.classList.contains('j-check') || target.classList.contains('j-label'))) {
                 document.querySelectorAll('.j-wrap').forEach(elm => {
                     elm.style.display = 'none'
                 })
@@ -68,18 +68,110 @@ export default () => {
     /**
      * create sort button
      * @param {Element} target 
-     * @param {Number} idx 
+     * @param {Number} columnIdx 
      */
-    const createSortButton = (target, idx) => {
+    const createSortButton = (target, columnIdx) => {
         const sortElm = document.createElement('span')
         sortElm.textContent = 's'
         sortElm.classList.add('j-sort')
         sortElm.addEventListener('click', (event) => {
             event.preventDefault()
-            console.log(idx)
-            jRef.current.jspreadsheet.orderBy(idx)
+            jRef.current.jspreadsheet.orderBy(columnIdx)
         })
         target.insertAdjacentElement('beforeend', sortElm);
+    }
+
+    /**
+     * create filter button
+     * @param {Element} target 
+     * @param {Number} idx  
+     */
+    const createFilterButton = (target, columnIdx) => {
+        // フィルタボックスを作成
+        const filter = createDom(`
+                    <div class="j-filter">f
+                        <div class="j-wrap">
+                            <ul class="j-list">
+                            </ul>
+                            <button class="j-cancel">cancel</button>
+                            <button class="j-done">ok</button>
+                        </div>
+                    </div>
+                    `)
+
+        // ラッパエレメントを取得
+        const wrapElm = filter.querySelector('.j-wrap')
+
+        // ラッパエレメントにイベント追加
+        wrapElm.addEventListener('click', (event) => {
+            // 親のイベントをキャンセル
+            event.stopPropagation()
+        })
+
+        // リストエレメント取得
+        const listElm = filter.querySelector('.j-list')
+
+        // フィルタエレメント（ボタン）にイベント追加
+        filter.addEventListener('click', (event) => {
+            // デフォルトイベント停止
+            event.preventDefault()
+
+            // すべて非表示
+            document.querySelectorAll('.j-wrap').forEach(elm => {
+                elm.style.display = 'none'
+            })
+
+            // 中身を空にする
+            listElm.innerHTML = ''
+
+            // カラムの縦リストを取得
+            let columnList = jRef.current.jspreadsheet.getColumnData(columnIdx)
+
+            // 重複削除
+            columnList = [...new Set(columnList)]
+
+            // 空文字削除
+            columnList = columnList.filter((value) => {
+                return value != ''
+            })
+
+            // アクティブ リスト
+            let activeList = wrapElm.dataset.active?.split(',') ?? []
+
+            // リストにアイテムを追加していく
+            columnList.forEach((value, rowIndex) => {
+                // アイテムを作成
+                const itemElm = createDom(`
+                            <li class="j-item">
+                                <label class="j-label"><input class="j-check" type="checkbox" value="${value}" />${value}<label>
+                            </li>
+                            `)
+
+                // アイテムのチェックボックスを取得
+                const inputElm = itemElm.querySelector('.j-check')
+                // アクティブのとき
+                inputElm.checked = activeList.includes(String(value))
+
+                // アイテムのチェックボックスにイベントを追加
+                inputElm.addEventListener('change', (event) => {
+                    let actives = wrapElm.dataset.active?.split(',') ?? []
+
+                    if (event.target.checked) {
+                        actives.push(event.target.value)
+                    } else {
+                        actives = actives.filter((value) => value != event.target.value)
+                    }
+                    // データセットに設定
+                    wrapElm.dataset.active = actives.join(',')
+                })
+                listElm.insertAdjacentElement('beforeend', itemElm)
+            })
+
+            // 表示させる
+            wrapElm.style.display = "block"
+        })
+
+        target.insertAdjacentElement('beforeend', filter)
     }
 
     useEffect(() => {
@@ -100,67 +192,13 @@ export default () => {
                 // レコードのセット
                 jRef.current.jspreadsheet.setData(record)
 
+                // 各カラムを回る
                 jRef.current.jspreadsheet.headers.forEach((target, columnIdx) => {
-                    // ソート
+                    //! ソートボタンを追加
                     createSortButton(target, columnIdx)
 
-                    // フィルタ
-                    const filter = createDom(`
-                    <div class="j-filter">f
-                        <div class="j-wrap">
-                            <ul class="j-list">
-                            </ul>
-                            <button class="j-cancel">cancel</button>
-                            <button class="j-done">ok</button>
-                        </div>
-                    </div>
-                    `)
-
-                    const wrapElm = filter.querySelector('.j-wrap')
-                    const listElm = filter.querySelector('.j-list')
-
-                    filter.addEventListener('click', (event) => {
-                        // デフォルトイベント停止
-                        event.preventDefault()
-
-                        // すべて非常時
-                        document.querySelectorAll('.j-wrap').forEach(elm => {
-                            elm.style.display = 'none'
-                        })
-
-                        // 中身を空にする
-                        listElm.innerHTML = ''
-
-                        // カラムの縦リストを取得
-                        let columnList = jRef.current.jspreadsheet.getColumnData(columnIdx)
-
-                        // 重複削除
-                        // columnList = Array.from(new Set(columnList))
-                        columnList = [...new Set(columnList)]
-
-                        // 空文字削除
-                        columnList = columnList.filter((value) => {
-                            return value != ''
-                        })
-
-                        // リストを追加していく
-                        columnList.forEach((value, rowIndex) => {
-                            const itemElm = document.createElement('li')
-                            itemElm.textContent = value
-                            itemElm.classList.add('j-item')
-                            itemElm.addEventListener('click', (event) => {
-                                event.preventDefault()
-                                console.log(columnIdx)
-                                // console.log(rowIndex)　これは重複削除でつかえない
-                            })
-                            listElm.insertAdjacentElement('beforeend', itemElm)
-                        })
-
-                        // 表示させる
-                        wrapElm.style.display = "block"
-                    })
-
-                    target.insertAdjacentElement('beforeend', filter)
+                    //! フィルタボタンを追加     
+                    createFilterButton(target, columnIdx)
                 });
             })()
         }
