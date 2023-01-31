@@ -24,10 +24,11 @@ export default () => {
         tableHeight: '100vh',
         tableWidth: '100vw',
         columnSorting: false,
-        oncreateedit: () => { console.log('create edit!') },
-        onchange: () => { console.log('change!') },
-        onselection: () => { console.log('selection!') },
-        onevent: () => { console.log('event!') },
+        minSpareRows: 5,
+        // oncreateedit: () => { console.log('create edit!') },
+        // onchange: () => { console.log('change!') },
+        // onselection: () => { console.log('selection!') },
+        // onevent: () => { console.log('event!') },
     }
 
     /**
@@ -87,17 +88,20 @@ export default () => {
      * @param {Number} idx  
      */
     const createFilterButton = (target, columnIdx) => {
+        // テーブルボディーを取得
+        const table = document.querySelector('.jexcel tbody')
+
         // フィルタボックスを作成
         const filter = createDom(`
-                    <div class="j-filter">f
-                        <div class="j-wrap">
-                            <ul class="j-list">
-                            </ul>
-                            <button class="j-cancel">cancel</button>
-                            <button class="j-done">ok</button>
-                        </div>
-                    </div>
-                    `)
+        <div class="j-filter">f
+            <div class="j-wrap">
+                <ul class="j-list">
+                </ul>
+                <button class="j-cancel">cancel</button>
+                <button class="j-ok">ok</button>
+            </div>
+        </div>
+        `)
 
         // ラッパエレメントを取得
         const wrapElm = filter.querySelector('.j-wrap')
@@ -124,8 +128,16 @@ export default () => {
             // 中身を空にする
             listElm.innerHTML = ''
 
-            // カラムの縦リストを取得
-            let columnList = jRef.current.jspreadsheet.getColumnData(columnIdx)
+            //! カラムの縦リストを取得
+            // let columnList = jRef.current.jspreadsheet.getColumnData(columnIdx)
+            const columnElms = table.querySelectorAll(`td:nth-child(${columnIdx + 2})`)
+            let columnList = [];
+            for (const columnElm of columnElms) {
+                //! 非表示のとき
+
+                columnList.push(columnElm.textContent)
+            }
+            console.log(columnList);
 
             // 重複削除
             columnList = [...new Set(columnList)]
@@ -142,10 +154,10 @@ export default () => {
             columnList.forEach((value, rowIndex) => {
                 // アイテムを作成
                 const itemElm = createDom(`
-                            <li class="j-item">
-                                <label class="j-label"><input class="j-check" type="checkbox" value="${value}" />${value}<label>
-                            </li>
-                            `)
+                <li class="j-item">
+                    <label class="j-label"><input class="j-check" type="checkbox" value="${value}" />${value}<label>
+                </li>
+                `)
 
                 // アイテムのチェックボックスを取得
                 const inputElm = itemElm.querySelector('.j-check')
@@ -154,21 +166,49 @@ export default () => {
 
                 // アイテムのチェックボックスにイベントを追加
                 inputElm.addEventListener('change', (event) => {
-                    let actives = wrapElm.dataset.active?.split(',') ?? []
-
+                    // todo:: true false 逆にする
+                    // チェックを追加した場合は配列に追加
                     if (event.target.checked) {
-                        actives.push(event.target.value)
-                    } else {
-                        actives = actives.filter((value) => value != event.target.value)
+                        activeList.push(event.target.value)
+                    }
+                    // チェックを外したときは配列から削除
+                    else {
+                        activeList = activeList.filter((value) => value != event.target.value)
                     }
                     // データセットに設定
-                    wrapElm.dataset.active = actives.join(',')
+                    wrapElm.dataset.active = activeList.join(',')
                 })
                 listElm.insertAdjacentElement('beforeend', itemElm)
             })
 
             // 表示させる
             wrapElm.style.display = "block"
+        })
+
+        // キャンセル エレメント取得
+        const cancelElm = filter.querySelector('.j-cancel')
+        cancelElm.addEventListener('click', (event) => {
+            wrapElm.style.display = 'none'
+            // 元に戻す
+        })
+
+        // OK エレメント取得
+        const okElm = filter.querySelector('.j-ok')
+        okElm.addEventListener('click', (event) => {
+            wrapElm.style.display = 'none'
+            // フィルタする
+            // 現在のフィルタを取得
+            let activeList = wrapElm.dataset.active?.split(',') ?? []
+            // テーブル取得
+            const table = document.querySelector('.jexcel tbody')
+            // カラムアイテムを取得してまわる
+            const columnItems = table.querySelectorAll(`td:nth-child(${columnIdx + 2})`);
+            for (const columnItem of columnItems) {
+                // フィルタにヒットした場合
+                if (activeList.includes(columnItem.textContent)) {
+                    columnItem.closest('tr').style.display = 'none'
+                }
+            }
         })
 
         target.insertAdjacentElement('beforeend', filter)
@@ -194,6 +234,15 @@ export default () => {
 
                 // 各カラムを回る
                 jRef.current.jspreadsheet.headers.forEach((target, columnIdx) => {
+                    // フィルタボックスを閉じる
+                    document.querySelector('.jexcel_content').addEventListener('scroll', () => {
+                        document.querySelectorAll('.j-wrap').forEach(elm => {
+                            if(elm.style.display !== 'none') {
+                                elm.style.display = 'none'
+                            }
+                        })
+                    })
+
                     //! ソートボタンを追加
                     createSortButton(target, columnIdx)
 
