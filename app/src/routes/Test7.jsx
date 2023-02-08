@@ -188,8 +188,7 @@ export default forwardRef((props, ref) => {
             const { last, start, end, pages } = func.createPaginate(total, current);
             setPaginate(paginate => { return { ...paginate, total, current, last, start, end, pages } })
         }
-    }, [paginate])
-    // }, [hideColumns, lang, metaDivision, options, props.mode, widthType]);
+    }, [options, fetch, paginate])
 
     return (
         <>
