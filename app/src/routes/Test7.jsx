@@ -30,12 +30,14 @@ export default forwardRef((props, ref) => {
         console.log('set message!')
     }
 
+
     // スプレッドシートの設定
     let options = {
         worksheets: [{
             ...fetch.options,
-            // Todo:: pagination: 1000,
-            pagination: 3,
+            // Todo:: 
+            // pagination: 1000,
+            pagination: 6,
             paginationOptions: [10, 25, 50, 100],
             // 列のドラッグ
             columnDrag: false,
@@ -116,31 +118,69 @@ export default forwardRef((props, ref) => {
 
             //! 関連のあるメタの作成または新規バージョン登録
             if (
-                fetch.editMode === constEditMode.copyRelationCreate ||
-                fetch.editMode === constEditMode.newVersionCreate
+                // true
+                fetch.editMode === constEditMode.copyRelationCreate || fetch.editMode === constEditMode.newVersionCreate
             ) {
-                //参照状態フラグからセルの変更可否を設定
-                for (i = 0; i < jRef.current.jexcel.rows.length; i++) {
-                    for (let j = 1; j < jRef.current.jexcel.rows[i].cells.length; j++) {
+                const rows = options.worksheets[0].data
+                rows.forEach((row, i) => {
+                    row.forEach((value, j) => {
                         //参照フラグが2の場合は表示順と追加対象外フラグ以外は変更不可にする
-                        if (
-                            jRef.current.jexcel.rows[i].cells[refIndex + 1].textContent ===
-                            "2" &&
-                            j !== seqIndex + 1 &&
-                            j !== notCoveredIndex + 1
-                        ) {
-                            //チェックボックス
-                            if (jRef.current.jexcel.rows[i].cells[j].children.length > 0) {
-                                jRef.current.jexcel.rows[i].cells[j].className = "readonly";
-                                jRef.current.jexcel.rows[i].cells[j].children[0].disabled =
-                                    true;
-                            } else {
-                                jRef.current.jexcel.rows[i].cells[j].className = "readonly";
-                            }
+                        if (rows[i][refIndex] === "2" && j !== seqIndex + 1 && j !== notCoveredIndex + 1) {
+                            // セルを取得
+                            const cell = jRef.current.jspreadsheet[0].getCellFromCoords(j, i)
+                            jRef.current.jspreadsheet[0].setReadOnly(cell, true)
                         }
-                    }
-                }
+                    })
+                })
             }
+            //! 承認済みの更新またはパッチバージョンが1以上の更新(作成中)
+            // else if (
+            //     props.editMode === constEditMode.approvedNewVersionCreate ||
+            //     (updatePatchVersion && updatePatchVersion > 0)
+            // ) {
+            //     //参照状態フラグからセルの変更可否を設定
+            //     for (i = 0; i < jRef.current.jexcel.rows.length; i++) {
+            //         for (let k = 1; k < jRef.current.jexcel.rows[i].cells.length; k++) {
+            //             //追加対象外フラグについては参照フラグの値に関わらず変更不可
+            //             //参照フラグが1または2の場合は表示順以外も変更不可にする
+            //             if (
+            //                 k === notCoveredIndex + 1 ||
+            //                 k === codeIndex + 1 ||
+            //                 ((jRef.current.jexcel.rows[i].cells[refIndex + 1].textContent ===
+            //                     "1" ||
+            //                     jRef.current.jexcel.rows[i].cells[refIndex + 1].textContent ===
+            //                     "2") &&
+            //                     k !== seqIndex + 1)
+            //             ) {
+            //                 //チェックボックス
+            //                 if (jRef.current.jexcel.rows[i].cells[k].children.length > 0) {
+            //                     jRef.current.jexcel.rows[i].cells[k].className = "readonly";
+            //                     jRef.current.jexcel.rows[i].cells[k].children[0].disabled = true;
+            //                 } else {
+            //                     jRef.current.jexcel.rows[i].cells[k].className = "readonly";
+            //                 }
+            //             }
+            //         }
+            //     }
+            // }
+            //! 更新（作成中）
+            // else if (props.editMode === constEditMode.update) {
+            //     //参照状態フラグからセルの変更可否を設定
+            //     for (i = 0; i < jRef.current.jexcel.rows.length; i++) {
+            //         for (let l = 1; l < jRef.current.jexcel.rows[i].cells.length; l++) {
+            //             //参照フラグが2の場合は表示順以外は変更不可にする
+            //             if (jRef.current.jexcel.rows[i].cells[refIndex + 1].textContent === "2" && l !== seqIndex + 1 && l !== notCoveredIndex + 1) {
+            //                 //チェックボックス
+            //                 if (jRef.current.jexcel.rows[i].cells[l].children.length > 0) {
+            //                     jRef.current.jexcel.rows[i].cells[l].className = "readonly";
+            //                     jRef.current.jexcel.rows[i].cells[l].children[0].disabled = true;
+            //                 } else {
+            //                     jRef.current.jexcel.rows[i].cells[l].className = "readonly";
+            //                 }
+            //             }
+            //         }
+            //     }
+            // }
 
             // ページネート
             const total = jRef.current.jspreadsheet[0].quantityOfPages()

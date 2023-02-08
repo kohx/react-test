@@ -1,5 +1,10 @@
 import { constEditMode, constNumberingRule } from "@/test7Const";
 
+/**
+ * isError
+ * @param {Element} jRef
+ * @returns {Boolean}
+ */
 const isError = (jRef) => {
     let isError = false;
     const sheet = jRef.current.jspreadsheet[0]
@@ -300,7 +305,7 @@ const onSelection = (obj, px, py, ux, uy, setMessage) => {
 };
 
 /**
- * onChange
+ * inputCheck
  * @param {Object} obj - worksheetInstance
  * @param {DOMElement} cell - borderLeft
  * @param {Number} x
@@ -359,6 +364,16 @@ const inputCheck = (obj, cell, x, y, newValue, setMessage, mode) => {
     return true
 }
 
+/**
+ * onChange is alias of inputCheck
+ * @param {Object} obj - worksheetInstance
+ * @param {DOMElement} cell - borderLeft
+ * @param {Number} x
+ * @param {Number} y
+ * @param {Any} newValue
+ * @param {Number} mode
+ * @returns {void}
+ */
 const onChange = (obj, cell, x, y, newValue, setMessage, mode) => {
     return inputCheck(obj, cell, x, y, newValue, setMessage, mode)
 }
