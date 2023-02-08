@@ -1,7 +1,7 @@
 import { constEditMode, constNumberingRule } from "@/test7Const";
 
 /**
- * 
+ * setRequireColumn
  * @param {Element} jRef 
  * @param {Object} options 
  */
@@ -16,6 +16,54 @@ const setRequireColumn = (jRef, options) => {
     })
 }
 
+/**
+ * createPaginate
+ * @param {Number} total 
+ * @param {Number} current 
+ * @returns 
+ */
+const per = 1
+const frow = 2
+const divide = frow * 2 + 1
+const createPaginate = (total, current) => {
+    let last = (Math.ceil(total / per))
+    const forward = frow
+    const backward = last - frow + 1
+    let start = null
+    let end = null
+
+    if (last < divide) {
+        start = 1
+        end = last
+    } else {
+        if (forward >= current) {
+            start = 1
+            end = divide;
+        } else if (backward <= current) {
+            start = last - divide + 1
+            end = last
+        } else {
+            start = current - frow;
+            end = current + frow;
+        }
+    }
+
+    let pages = []
+    for (let i = start; i <= end; i++) {
+        pages.push({
+            num: i,
+            className: current === i ? 'pagination__item pagination__item--selected' : 'pagination__item'
+        })
+    }
+
+    return { last, start, end, pages }
+}
+
+/**
+ * changeReadOnlyCell
+ * @param {Number} fetchMode 
+ * @param {Object} options 
+ */
 const changeReadOnlyCell = (fetchMode, options) => {
     if (fetchMode === 1) {
         // セルの編集不可
@@ -278,4 +326,4 @@ const onChange = (obj, cell, x, y, newValue, setMessage, mode) => {
     return true
 }
 
-export default { setRequireColumn, changeReadOnlyCell, contextMenu, onSelection, onChange }
+export default { setRequireColumn, createPaginate, changeReadOnlyCell, contextMenu, onSelection, onChange }

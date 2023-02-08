@@ -6,9 +6,34 @@
 }
 
 .jss_pagination {
-    display: none;
+    /* display: none; */
 }
 
-.filter-hide::before {
-    display: none;
+.pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.pagination__list {
+    display: flex;
+    list-style: none;
+    padding-right: 10px;
+    padding-top: 10px;
+}
+
+.pagination__item {
+    text-align: center;
+    width: 36px;
+    height: 36px;
+    line-height: 34px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+    margin-left: 2px;
+    cursor: pointer;
+}
+
+.pagination__item--selected {
+    font-weight: bold;
+    background-color: #f3f3f3;
 }

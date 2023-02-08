@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useMemo, useCallback, createElement } from 'react'
+import React, { useState, useRef, useEffect, useCallback, createElement } from 'react'
 import api from '@/lib/axios/api'
 import "jsuites/dist/jsuites.js"
 import "jsuites/dist/jsuites.css"
@@ -20,7 +20,6 @@ export default () => {
      * ! 要素取得
      */
     const jRef = useRef(null)
-    const jPagination = useRef(null)
 
     // だみー！
     fetch.setMessage = () => {
@@ -34,7 +33,7 @@ export default () => {
         worksheets: [{
             ...fetch.options,
             // Todo:: pagination: 1000,
-            pagination: 4,
+            pagination: 1,
             paginationOptions: [10, 25, 50, 100],
             // 列のドラッグ
             columnDrag: false,
@@ -60,31 +59,49 @@ export default () => {
     // ワイドタイプで高さを変更
     const tableHeight = fetch.widthType === 1 ? '30%' : '60%'
 
+    // ページネート
+    const [paginate, setPaginate] = useState({ total: null, current: 1, last: 1, start: 1, end: 1, pages: [] })
+
+    const toPage = (current) => {
+        const { last, start, end, pages } = func.createPaginate(paginate.total, current);
+        jRef.current.jspreadsheet[0].page(current - 1)
+        setPaginate(paginate => { return { ...paginate, current, last, start, end, pages } })
+    }
+
+
     useEffect(() => {
         // 最初のレンダー
         if (!jRef.current.jspreadsheet) {
 
+            // スプレッドシートの表示
             jspreadsheet(jRef.current, options)
 
             // ヘッダの必須項目に「*」と色を付ける
             func.setRequireColumn(jRef, options)
 
-            // ページネート作成用
-            const totalPage = jRef.current.jspreadsheet[0].quantityOfPages()
-            // console.log(totalPage);
-            const toPage = (page) => jRef.current.jspreadsheet[0].page(page - 1)
-            // toPage(3)
-            const currentPage = jRef.current.jspreadsheet[0].pageNumber + 1
-            // console.log(currentPage);
+            // ページネート
+            const total = jRef.current.jspreadsheet[0].quantityOfPages()
+            const current = jRef.current.jspreadsheet[0].pageNumber + 1
+            const { last, start, end, pages } = func.createPaginate(total, current);
+            setPaginate(paginate => { return { ...paginate, total, current, last, start, end, pages } })
         }
-    }, [])
+    }, [paginate])
 
     return (
         <>
             <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Material+Icons" />
             <div className="test7-wrapper" style={{ height: tableHeight }}>
                 <div className='test7-table' ref={jRef} />
-                <div className='test7-pagination' ref={jPagination} ></div>
+                <div className='pagination'>
+                    <div>{paginate.total}ページ中 {paginate.current}ページを表示</div>
+                    <ul className='pagination__list'>
+                        {paginate.start !== paginate.current && <li className="pagination__item" onClick={() => toPage(1, paginate, setPaginate)}>&lt;</li>}
+                        {paginate.pages.length > 1 && paginate.pages.map(page =>
+                            <li key={page.num} className={page.className} onClick={() => toPage(page.num, paginate, setPaginate)}>{page.num}</li>
+                        )}
+                        {paginate.end !== paginate.current && <li className="pagination__item" onClick={() => toPage(paginate.last, paginate, setPaginate)}>&gt;</li>}
+                    </ul>
+                </div>
             </div>
         </>
     )
