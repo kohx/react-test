@@ -1,5 +1,38 @@
 import { constEditMode, constNumberingRule } from "@/test7Const";
 
+const isError = (jRef) => {
+    let isError = false;
+    const sheet = jRef.current.jspreadsheet[0]
+    // 入力エラーチェック
+    const columns = sheet.getHeaders().split(",")
+
+    // const rows = sheet.getColumnData(-1)
+    const rows = sheet.getColumnData(1)
+
+    // eslint-disable-next-line array-callback-return
+    rows.map((row, rIndex) => {
+        // eslint-disable-next-line array-callback-return
+        // いづれかのカラムに入力があるかチェック
+        const rowData = sheet.getRowData(rIndex);
+        let isInput = false;
+        for (let i = 0; i < rowData.length - 1; i++) {
+            if (rowData[i]) {
+                isInput = true;
+            }
+        }
+        if (isInput) {
+            columns.forEach((col, cIndex) => {
+                const cell = sheet.getCellFromCoords(cIndex, rIndex)
+                const value = sheet.getValueFromCoords(cIndex, rIndex)
+                if (!func.inputCheck(sheet, cell, cIndex, rIndex, value, fetch.setMessage, 1)) {
+                    isError = true;
+                }
+            })
+        }
+    })
+    return isError;
+}
+
 /**
  * setRequireColumn
  * @param {Element} jRef 
@@ -276,11 +309,11 @@ const onSelection = (obj, px, py, ux, uy, setMessage) => {
  * @param {Number} mode
  * @returns {void}
  */
-const onChange = (obj, cell, x, y, newValue, setMessage, mode) => {
+const inputCheck = (obj, cell, x, y, newValue, setMessage, mode) => {
     const column = obj.getColumn(x)
     const maxLength = column.maxLength
     const format = column.cFormat
-    const value = newValue.trim()
+    const value = typeof newValue === 'string' ? newValue.trim() : newValue
     const itemName = column.title
     const type = column.type
     const require = column.isRequire
@@ -318,7 +351,7 @@ const onChange = (obj, cell, x, y, newValue, setMessage, mode) => {
     setMessage();
     obj.setComments(cellName, ``)
     //自動採番の場合はコードの背景色はグレー
-    if (x === 0 && numberingRule === constNumberingRule.auto) {
+    if (x === 0 && fetch.numberingRule === constNumberingRule.auto) {
         cell.style.backgroundColor = "#f3f3f3";
     } else {
         cell.style.backgroundColor = "#fff";
@@ -326,4 +359,8 @@ const onChange = (obj, cell, x, y, newValue, setMessage, mode) => {
     return true
 }
 
-export default { setRequireColumn, createPaginate, changeReadOnlyCell, contextMenu, onSelection, onChange }
+const onChange = (obj, cell, x, y, newValue, setMessage, mode) => {
+    return inputCheck(obj, cell, x, y, newValue, setMessage, mode)
+}
+
+export default { isError, setRequireColumn, createPaginate, changeReadOnlyCell, contextMenu, onSelection, inputCheck, onChange }
