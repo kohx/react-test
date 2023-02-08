@@ -15,6 +15,8 @@ import Test3 from '@/routes/Test3'
 import Test4 from '@/routes/Test4'
 import Test5 from '@/routes/Test5'
 import Test6 from '@/routes/Test6'
+import Test7 from '@/routes/Test7'
+import Test8 from '@/routes/Test8'
 import NotFound from '@/routes/NotFound'
 
 //　ナビのコンポネントを追加
@@ -44,6 +46,8 @@ export default () => {
         <Route path="/test4" element={<Test4 />} />
         <Route path="/test5" element={<Test5 />} />
         <Route path="/test6" element={<Test6 />} />
+        <Route path="/test7" element={<Test7 />} />
+        <Route path="/test8" element={<Test8 />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </div>

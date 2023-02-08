@@ -6,40 +6,32 @@
     },
     {
         "title": "Price",
-        "width": 200,
-        "type": "numeric"
+        "width": 300,
+        "type": "text"
     },
     {
         "title": "Date",
-        "width": 200,
-        "type": "calendar",
-        "options": {
-            "format": "DD/MM/YYYY"
-        }
+        "width": 300,
+        "type": "text"
     },
     {
         "title": "Photo",
-        "width": 250,
-        "type": "image"
+        "width": 300,
+        "type": "text"
     },
     {
         "title": "Condition",
-        "width": 250,
-        "type": "dropdown",
-        "source": [
-            "New",
-            "Used"
-        ]
+        "width": 300,
+        "type": "text"
     },
     {
         "title": "Color",
-        "width": 250,
-        "type": "color",
-        "render": "square"
+        "width": 300,
+        "type": "text"
     },
     {
         "title": "Available",
-        "width": 250,
-        "type": "checkbox"
+        "width": 300,
+        "type": "text"
     }
 ]

@@ -1,0 +1,14 @@
+.test7-wrapper {
+    width: 100%;
+    height: 50%;
+    margin-inline: auto;
+    overflow: scroll;
+}
+
+.jss_pagination {
+    display: none;
+}
+
+.filter-hide::before {
+    display: none;
+}

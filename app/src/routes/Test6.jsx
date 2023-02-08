@@ -24,11 +24,49 @@ export default () => {
         tableHeight: '100vh',
         tableWidth: '100vw',
         columnSorting: false,
-        minSpareRows: 5,
-        // oncreateedit: () => { console.log('create edit!') },
-        // onchange: () => { console.log('change!') },
-        // onselection: () => { console.log('selection!') },
-        // onevent: () => { console.log('event!') },
+        minSpareRows: 8,
+        // onafterchanges: (records) => { console.log('onafterchanges!') },
+        // onbeforechange: (el, cell, x, y, value) => { console.log('onbeforechange!') },
+        // oneditionend: (el, cell, x, y, value, save) => { console.log('oneditionend!') },
+        // oneditionstart: (el, cell, x, y) => { console.log('oneditionstart!') },
+        // onbeforesave: (el, obj, data) => { console.log('onbeforesave!') },
+        // onsave: (el, obj, data) => { console.log('onsave!') },
+        // onchange: (el, cell, x, y, value, oldValue) => { console.log('onchange!') },
+        onselection: (el, px, py, ux, uy, origin) => {
+            console.log('onselection!')
+            console.log(el)
+            console.log(`${px}:${py}`)
+            console.log(`${ux}:${uy}`)
+            console.log(origin)
+        },
+        // onsort: (el, column, order) => { console.log('onsort!') },
+        // onbeforeinsertcolumn: (el, columnNumber, numOfColumns, insertBefore) => { console.log('onbeforeinsertcolumn!') },
+        // oninsertcolumn: (el, columnNumber, numOfColumns, historyRecords, insertBefore) => { console.log('oninsertcolumn!') },
+        // onbeforedeletecolumn: (el, columnNumber, numOfColumns) => { console.log('onbeforedeletecolumn!') },
+        // ondeletecolumn: (el, columnNumber, numOfColumns, historyRecords) => { console.log('ondeletecolumn!') },
+        // onmovecolumn: (el, o, d) => { console.log('onmovecolumn!') },
+        // onresizecolumn: (el, column, width, oldWidth) => { console.log('onresizecolumn!') },
+        // onbeforeinsertrow: (el, rowNumber, numOfRows, insertBefore) => { console.log('onbeforeinsertrow!') },
+        // oninsertrow: (el, rowNumber, numOfRows, rowRecords, insertBefore) => { console.log('oninsertrow!') },
+        // onbeforedeleterow: (el, rowNumber, numOfRows) => { console.log('onbeforedeleterow!') },
+        // ondeleterow: (el, rowNumber, numOfRows, rowRecords) => { console.log('ondeleterow!') },
+        // onmoverow: (el, o, d) => { console.log('onmoverow!') },
+        // onresizerow: (el, row, height, oldHeight) => { console.log('onresizerow!') },
+        // onchangeheader: (el, column, oldValue, newValue) => { console.log('onchangeheader!') },
+        // onchangemeta: (el, o, k, v) => { console.log('onchangemeta!') },
+        // onchangepage: (el, pageNumber, oldPage) => { console.log('onchangepage!') },
+        // onchangestyle: (el, o, k, v) => { console.log('onchangestyle!') },
+        // oncomments: (el, comments, title, cells) => { console.log('oncomments!') },
+        // oncreateeditor: (el, cell, x, y, editor) => { console.log('oncreateeditor!') },
+        // onblur: (el) => { console.log('onblur!') },
+        // onfocus: (el) => { console.log('onfocus!') },
+        // onload: (el, obj) => { console.log('onload!') },
+        // onmerge: (el, cellName, colspan, rowspan) => { console.log('onmerge!') },
+        // oncopy: (el, row, hashString) => { console.log('oncopy!') },
+        // onbeforepaste: (el, data, x, y) => { console.log('onbeforepaste!') },
+        // onpaste: (el, data) => { console.log('onpaste!') },
+        // onundo: (el, historyRecord) => { console.log('onundo!') },
+        // onredo: (el, historyRecord) => { console.log('onredo!') },
     }
 
     /**
@@ -112,6 +150,27 @@ export default () => {
             event.stopPropagation()
         })
 
+        //! カラムの縦リストを取得
+        // let columnList = jRef.current.jspreadsheet.getColumnData(columnIdx)
+        const columnElms = table.querySelectorAll(`td:nth-child(${columnIdx + 2})`)
+        let columnList = [];
+        for (const columnElm of columnElms) {
+            //! 非表示のとき
+            columnList.push(columnElm.textContent)
+        }
+        console.log(columnList);
+
+        // 重複削除
+        columnList = [...new Set(columnList)]
+
+        // 空文字削除
+        columnList = columnList.filter((value) => {
+            return value != ''
+        })
+
+        // 全選択状態をラップデータセットに設定
+        wrapElm.dataset.active = columnList.join(',')
+
         // リストエレメント取得
         const listElm = filter.querySelector('.j-list')
 
@@ -127,25 +186,6 @@ export default () => {
 
             // 中身を空にする
             listElm.innerHTML = ''
-
-            //! カラムの縦リストを取得
-            // let columnList = jRef.current.jspreadsheet.getColumnData(columnIdx)
-            const columnElms = table.querySelectorAll(`td:nth-child(${columnIdx + 2})`)
-            let columnList = [];
-            for (const columnElm of columnElms) {
-                //! 非表示のとき
-
-                columnList.push(columnElm.textContent)
-            }
-            console.log(columnList);
-
-            // 重複削除
-            columnList = [...new Set(columnList)]
-
-            // 空文字削除
-            columnList = columnList.filter((value) => {
-                return value != ''
-            })
 
             // アクティブ リスト
             let activeList = wrapElm.dataset.active?.split(',') ?? []
@@ -205,8 +245,10 @@ export default () => {
             const columnItems = table.querySelectorAll(`td:nth-child(${columnIdx + 2})`);
             for (const columnItem of columnItems) {
                 // フィルタにヒットした場合
-                if (activeList.includes(columnItem.textContent)) {
+                if (!activeList.includes(columnItem.textContent)) {
                     columnItem.closest('tr').style.display = 'none'
+                } else {
+                    columnItem.closest('tr').style.display = 'table-row'
                 }
             }
         })
@@ -237,7 +279,7 @@ export default () => {
                     // フィルタボックスを閉じる
                     document.querySelector('.jexcel_content').addEventListener('scroll', () => {
                         document.querySelectorAll('.j-wrap').forEach(elm => {
-                            if(elm.style.display !== 'none') {
+                            if (elm.style.display !== 'none') {
                                 elm.style.display = 'none'
                             }
                         })
