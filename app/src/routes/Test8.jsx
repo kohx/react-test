@@ -34,7 +34,7 @@ const Card = ({ id }) => {
     const card = getCard(id)
 
     return (
-        <div style={{ color: `${card.color}` }}>[{card.id}] {card.mark}: {card.number} </div>
+        <div style={{ color: `${card.color}`, border: "1px solid black", borderRadius: '5px', padding: "0.5ch", margin: "0.5ch" }}>[{card.id}] {card.mark}: {card.number} </div>
         // <div>{card.id}</div>
     )
 }
@@ -78,7 +78,7 @@ export default () => {
         table6: { table: table6, setTable: setTable6 },
     }
 
-    const [grab, setGrab] = useState({ from: null, ids: [] })
+    const [grab, setGrab] = useState({ origin: null, ids: [] })
 
     const drawCard = () => {
         const pick = stock[0]
@@ -105,18 +105,23 @@ export default () => {
         // todo 全部配る
     }
 
-    const grabCard = (from, ids) => {
+    const grabCard = (origin) => {
+        alert(origin)
+        console.log(origin);
+
         if (!ids || !ids.length) return
-        setGrab(grab => { return { ...generatePath, from, ids } })
+        setGrab(grab => { return { ...generatePath, origin, ids } })
     }
 
     const releaseCard = (event) => {
         if (!(event.target.closest('.deck') || event.target.closest('.table'))) {
-            setGrab(grab => { return { ...generatePath, from: null, ids: [] } })
+            setGrab(grab => { return { ...generatePath, origin: null, ids: [] } })
         }
     }
 
     const putCard = (target) => {
+        console.log(grab.origin);
+
         if (grab.ids.length > 0) {
             if (target.hasOwnProperty('deck')) {
 
@@ -132,6 +137,7 @@ export default () => {
                 const isSingle = grab.ids.length === 1
                 const isSameCode = deck.code === grabCard.code
                 const isRightNum = (deckMaxNum + 1) === grabCard.number
+
 
                 if (isSingle && isSameCode && isRightNum) {
                     setMessage('set!')
@@ -169,7 +175,7 @@ export default () => {
             <div style={{ display: 'flex', gap: '1ch', padding: '1ch' }}>
 
                 {/* stock */}
-                <div onClick={drawCard} style={{ border: '1px solid cornflowerblue', padding: '1ch' }}>
+                <div onClick={drawCard} style={{ border: '1px solid lightgray', padding: '1ch' }}>
                     stock [{stock.length}]
                     {/* <div style={{ display: 'none' }}> */}
                     {stock.map(s => <Card key={s} id={s} />)}
@@ -177,14 +183,14 @@ export default () => {
                 </div>
 
                 {/* draw */}
-                <div onMouseDown={() => grabCard('draw', draw ? [draw] : [])} style={{ border: '1px solid cornflowerblue', padding: '1ch' }} >
+                <div style={{ border: '1px solid cornflowerblue', padding: '1ch' }} >
                     draw
-                    <Card id={draw} />
+                    <Card id={draw} onMouseDown={() => grabCard(draw)} />
                 </div>
 
                 {/* grab */}
-                <div style={{ padding: '1ch', border: '1px solid crimson', alignSelf: 'flex-start', borderRadius: '10px', fontSize: '1.4em' }}>
-                    grab from {grab.from}
+                <div style={{ padding: '1ch', border: '2px solid tomato', alignSelf: 'flex-start' }}>
+                    grab from {grab.origin}
                     {grab.ids.map(g => <Card key={g} id={g} />)}
                 </div>
             </div>
@@ -209,9 +215,9 @@ export default () => {
                     const target = tables[tableName]
                     const table = target.table
                     return (
-                        <div className='table' onMouseUp={() => putCard(target)} ref={table.elm} key={tableName} onMouseDown={() => grabCard(tableName, table.ids)} style={{ border: '1px solid tomato', padding: '1ch' }}>
+                        <div className='table' onMouseUp={() => putCard(target)} key={tableName} style={{ border: '1px solid cornflowerblue', padding: '1ch' }}>
                             {tableName}: {table.open}
-                            {table.ids.length > 0 && table.ids.map(id => <Card key={id} id={id} />)}
+                            {table.ids.length > 0 && table.ids.map(id => <Card key={id} id={id} onMouseDown={() => grabCard(id)} />)}
                         </div>
                     )
                 })}
