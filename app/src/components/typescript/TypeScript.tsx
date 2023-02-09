@@ -11,6 +11,15 @@
 // [React開発において便利なTypeScriptの型まとめ](https://qiita.com/markey/items/134386ee98b277f181f7)
 // [React×TypeScript　基本の型定義](https://qiita.com/hinako_n/items/97ccaf85eb40d7e45657)
 
+// 型	    内容	                           例
+// number	整数や浮動小数点を含む整数値	     1, 30.3, -5
+// string	全ての文字列                       ‘I’, “My”
+// boolean	真偽値                            true or false
+// object	JavaScriptのObject型	          {name: “selfnote”}
+// Array	JavaScriptのArray型               [1, 2, 3]
+// Tuple	TypeScriptの独自の型: 固定長       [1, 2]
+// Enum	    TypeScriptの独自の型: 列挙型       enum { NEW, OLD }
+// any  	どんな型でも良い。型を指定しない。	*(アスタリスク)
 
 import React from 'react'
 

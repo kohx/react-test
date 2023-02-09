@@ -1,11 +1,12 @@
 import { constEditMode, constNumberingRule } from "@/test7Const";
+import { ChildProps, Handles } from '@/test7/type'
 
 /**
  * isError
  * @param {Element} jRef
  * @returns {Boolean}
  */
-const isError = (jRef) => {
+const isError = (jRef: any, props: any) => {
     let isError = false;
     const sheet = jRef.current.jspreadsheet[0]
     // 入力エラーチェック
@@ -15,7 +16,7 @@ const isError = (jRef) => {
     const rows = sheet.getColumnData(1)
 
     // eslint-disable-next-line array-callback-return
-    rows.map((row, rIndex) => {
+    rows.map((row: Array<T>, rIndex: number) => {
         // eslint-disable-next-line array-callback-return
         // いづれかのカラムに入力があるかチェック
         const rowData = sheet.getRowData(rIndex);
@@ -26,10 +27,10 @@ const isError = (jRef) => {
             }
         }
         if (isInput) {
-            columns.forEach((col, cIndex) => {
+            columns.forEach((col: Array<T>, cIndex: number) => {
                 const cell = sheet.getCellFromCoords(cIndex, rIndex)
                 const value = sheet.getValueFromCoords(cIndex, rIndex)
-                if (!func.inputCheck(sheet, cell, cIndex, rIndex, value, props.setMessage, 1)) {
+                if (!inputCheck(sheet, cell, cIndex, rIndex, value, props.setMessage, 1, props)) {
                     isError = true;
                 }
             })
@@ -40,25 +41,26 @@ const isError = (jRef) => {
 
 /**
  * 更新(作成中)の場合にパッチバージョンを返却
- * @param {Object} props 
- * @returns 
+ * @param {any} props 
+ * @returns {Number}
  */
-const updatePatchVersion = (props) => {
-
+const updatePatchVersion = (props: any) => {
     //パッチバージョンを取得する
     if (props.editMode === constEditMode.update && props.metaVersion) {
-        const versionArray = metaVersion.split(".")
+        const versionArray = props.metaVersion.split(".")
         return parseInt(versionArray[2])
+    } else {
+        return 0
     }
 }
 
 /**
  * setRequireColumn
- * @param {Element} jRef 
- * @param {Object} options 
+ * @param {MutableRefObject} jRef 
+ * @param {any} options 
  */
-const setRequireColumn = (jRef, options) => {
-    options.worksheets[0].columns.forEach((col, index) => {
+const setRequireColumn = (jRef: any, options: any) => {
+    options.worksheets[0].columns.forEach((col: any, index: number) => {
         if (col.isRequire) {
             jRef.current.jspreadsheet[0].headers[index].innerText += " *";
             jRef.current.jspreadsheet[0].headers[index].style.backgroundColor = "#f2dede";
@@ -68,13 +70,13 @@ const setRequireColumn = (jRef, options) => {
     })
 }
 
-const setColumnDetails = (jRef, options, props) => {
+const setColumnDetails = (jRef: any, options: any, props: any) => {
 
     // カラムから参照状態フラグ、表示順、追加対象外フラグのインデックスを取得
-    let refIndex
-    let seqIndex
-    let notCoveredIndex
-    let codeIndex
+    let refIndex: number
+    let seqIndex: number
+    let notCoveredIndex: number
+    let codeIndex: number
     const columns = options.worksheets[0].columns
 
     for (var i = 0; i < columns.length; i++) {
@@ -106,7 +108,7 @@ const setColumnDetails = (jRef, options, props) => {
         props.editMode === constEditMode.copyRelationCreate || props.editMode === constEditMode.newVersionCreate
     ) {
         const rows = options.worksheets[0].data
-        rows.forEach((row, i) => {
+        rows.forEach((row: Array<T>, i: number) => {
             row.forEach((value, j) => {
                 // 参照フラグが2の場合は表示順と追加対象外フラグ以外は変更不可にする
                 if (rows[i][refIndex] === "2" && j !== seqIndex + 1 && j !== notCoveredIndex + 1) {
@@ -120,12 +122,12 @@ const setColumnDetails = (jRef, options, props) => {
     // 承認済みの更新またはパッチバージョンが1以上の更新(作成中)
     else if (
         // false
-        props.editMode === constEditMode.approvedNewVersionCreate || (updatePatchVersion(props) && updatePatchVersion(props) > 0)
+        props.editMode === constEditMode.approvedNewVersionCreate || updatePatchVersion(props) > 0
     ) {
         const rows = options.worksheets[0].data
         // 参照状態フラグからセルの変更可否を設定
-        rows.forEach((row, i) => {
-            row.forEach((value, k) => {
+        rows.forEach((row: Array<T>, i: number) => {
+            row.forEach((value: any, k: number) => {
                 // 追加対象外フラグについては参照フラグの値に関わらず変更不可
                 // 参照フラグが1または2の場合は表示順以外も変更不可にする
                 if (k === notCoveredIndex + 1 || k === codeIndex + 1 || ((value === "1" || rows[i][refIndex] === "2") && k !== seqIndex + 1)) {
@@ -143,7 +145,7 @@ const setColumnDetails = (jRef, options, props) => {
     ) {
         // 参照状態フラグからセルの変更可否を設定
         const rows = options.worksheets[0].data
-        rows.forEach((row, i) => {
+        rows.forEach((row: Array<T>, i: number) => {
             row.forEach((value, l) => {
                 //参照フラグが2の場合は表示順以外は変更不可にする
                 if (rows[i][refIndex] === "2" && l !== seqIndex + 1 && l !== notCoveredIndex + 1) {
@@ -160,12 +162,12 @@ const setColumnDetails = (jRef, options, props) => {
  * createPaginate
  * @param {Number} total 
  * @param {Number} current 
- * @returns 
+ * @returns {Object}
  */
 const per = 1
 const frow = 2
 const divide = frow * 2 + 1
-const createPaginate = (total, current) => {
+const createPaginate = (total: number, current: number) => {
     let last = (Math.ceil(total / per))
     const forward = frow
     const backward = last - frow + 1
@@ -201,24 +203,21 @@ const createPaginate = (total, current) => {
 
 /**
  * changeReadOnlyCell
- * @param {Number} fetchMode 
- * @param {Object} options 
+ * @param {any} props 
+ * @param {any} options 
  */
-const changeReadOnlyCell = (options, props) => {
+const changeReadOnlyCell = (props: any, options: any) => {
     // モード１
     if (props.mode === 1) {
         // セルの編集不可
-        options.worksheets[0].columns.map(column => column.readOnly = true)
+        options.worksheets[0].columns.map((column: any) => column.readOnly = true)
     }
     // モード２
     else if (props.mode === 2) {
-        options.worksheets[0].columns.map(column => {
+        options.worksheets[0].columns.map((column: any) => {
             // 関連のあるメタの作成
             if (props.editMode === constEditMode.copyRelationCreate) {
-                if (
-                    column.title === "コード" &&
-                    props.numberingRule === constNumberingRule.auto
-                ) {
+                if (column.title === "コード" && props.numberingRule === constNumberingRule.auto) {
                     return (column.readOnly = true);
                 } else {
                     return (column.readOnly = false);
@@ -226,10 +225,7 @@ const changeReadOnlyCell = (options, props) => {
             } else {
                 if (column.title === "ID") {
                     return (column.readOnly = true);
-                } else if (
-                    column.title === "コード" &&
-                    props.numberingRule === constNumberingRule.auto
-                ) {
+                } else if (column.title === "コード" && props.numberingRule === constNumberingRule.auto) {
                     return (column.readOnly = true);
                 } else {
                     return (column.readOnly = false);
@@ -246,15 +242,16 @@ const changeReadOnlyCell = (options, props) => {
  * @param {Number} y - row number
  * @param {Object} e - mouse event handler
  * @param {Array} items - default contextmenu items
- * @param {String} section - section clicked. Sections: nested | header | row | cell | selectall | tabs | cloning | toolbar | footer
+ * @param {any} section - section clicked. Sections: nested | header | row | cell | selectall | tabs | cloning | toolbar | footer
+ * @param {any} props
  * @returns {Array}
  */
-const contextMenu = (obj, x, y, e, items, section) => {
+const contextMenu = (obj: any, x: any, y: any, e: any, items: any[], section: any, props: any) => {
     var items = [];
     var isUpdatePatchVersionUp = false;
 
     //パッチバージョンアップまたは更新(作成中)のパッチバージョンが1以上
-    if (props.editMode === constEditMode.approvedNewVersionCreate || (updatePatchVersion(props) && updatePatchVersion(props) > 0)) {
+    if (props.editMode === constEditMode.approvedNewVersionCreate || updatePatchVersion(props) > 0) {
         isUpdatePatchVersionUp = true;
     }
 
@@ -286,8 +283,7 @@ const contextMenu = (obj, x, y, e, items, section) => {
                         i < obj.rows[parseInt(y) + 1].childNodes.length;
                         i++
                     ) {
-                        obj.rows[parseInt(y)].childNodes[i].style.display =
-                            obj.rows[parseInt(y) + 1].childNodes[i].style.display;
+                        obj.rows[parseInt(y)].childNodes[i].style.display = obj.rows[parseInt(y) + 1].childNodes[i].style.display;
                     }
                 },
             });
@@ -362,7 +358,7 @@ const contextMenu = (obj, x, y, e, items, section) => {
  * @param {Number} y 
  * @returns {String}
  */
-const getRowName = (x, y) => {
+const getRowName = (x: number, y: number) => {
     const col = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".substring(Number(x), Number(x) + 1)
     return col + (Number(y) + 1)
 };
@@ -374,10 +370,10 @@ const getRowName = (x, y) => {
  * @param {Number} py - borderTop
  * @param {Number} ux - borderRight
  * @param {Number} uy - borderBottom
- * @param {Object} origin
+ * @param {Function | undefined} setMessage
  * @returns {void}
  */
-const onSelection = (obj, px, py, ux, uy, setMessage) => {
+const onSelection = (obj: any, px: number, py: number, ux: number, uy: number, setMessage: Function | undefined) => {
 
     //クリックしたセルがコンボボックスの場合はリストを展開する
     if (obj.getColumn(px).type === "dropdown") {
@@ -400,11 +396,13 @@ const onSelection = (obj, px, py, ux, uy, setMessage) => {
  * @param {DOMElement} cell - borderLeft
  * @param {Number} x
  * @param {Number} y
- * @param {Any} newValue
- * @param {Number} mode
+ * @param {any} newValue
+ * @param {Function | undefined} setMessage
+ * @param {any} mode
+ * @param {any} props
  * @returns {void}
  */
-const inputCheck = (obj, cell, x, y, newValue, setMessage, mode) => {
+const inputCheck = (obj: any, cell: any, x: number, y: number, newValue: any, setMessage: Function | undefined, mode: any, props: any) => {
     const column = obj.getColumn(x)
     const maxLength = column.maxLength
     const format = column.cFormat
@@ -443,7 +441,7 @@ const inputCheck = (obj, cell, x, y, newValue, setMessage, mode) => {
         }
     }
 
-    setMessage();
+    props.setMessage();
     obj.setComments(cellName, ``)
     //自動採番の場合はコードの背景色はグレー
     if (x === 0 && props.numberingRule === constNumberingRule.auto) {
@@ -461,11 +459,12 @@ const inputCheck = (obj, cell, x, y, newValue, setMessage, mode) => {
  * @param {Number} x
  * @param {Number} y
  * @param {Any} newValue
+ * @param {Function | undefined} setMessage
  * @param {Number} mode
  * @returns {void}
  */
-const onChange = (obj, cell, x, y, newValue, setMessage, mode) => {
-    return inputCheck(obj, cell, x, y, newValue, setMessage, mode)
+const onChange = (obj: any, cell: any, x: number, y: number, newValue: any, setMessage: Function | undefined, mode: any, props: any) => {
+    return inputCheck(obj, cell, x, y, newValue, setMessage, mode, props)
 }
 
 export default { isError, setRequireColumn, setColumnDetails, createPaginate, changeReadOnlyCell, contextMenu, onSelection, inputCheck, onChange }

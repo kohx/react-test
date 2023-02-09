@@ -18,3 +18,12 @@ export interface ChildProps {
     category?: string;
     metaVersion?: string;
 }
+
+export type Paginate = {
+    total: number
+    current: number
+    last: number
+    start: number
+    end: number
+    pages: Array<any>
+}
