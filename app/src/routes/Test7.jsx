@@ -7,8 +7,7 @@ import "jspreadsheet-ce/dist/jspreadsheet.css"
 import jspreadsheet from "jspreadsheet"
 import jSuites from "jsuites";
 import "@/../node_modules/jspreadsheet/dist/jspreadsheet.css"
-// import columns from "../../dist/json/columns"
-import fetch from "../../dist/json/fetch"
+import fetch from "@/json/fetch"
 import "@/test7/test7.css"
 import func from "@/test7/test7"
 import { constEditMode, constNumberingRule } from "@/test7Const";

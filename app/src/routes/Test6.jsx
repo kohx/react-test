@@ -5,7 +5,7 @@ import "jsuites/dist/jsuites.css"
 import "jspreadsheet-ce/dist/jspreadsheet.css"
 import jspreadsheet from "jspreadsheet-ce"
 
-import columns from "../../dist/json/columns"
+import columns from "@/json/columns"
 
 export default () => {
     /**
