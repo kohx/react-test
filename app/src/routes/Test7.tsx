@@ -12,7 +12,7 @@ import "@/test7/test7.css"
 import func from "@/test7/test7"
 import { ChildProps, Handles, Paginate } from '@/test7/type'
 
-export default forwardRef<Handles, ChildProps>((props: any, ref?: any) => {
+export default forwardRef<Handles, ChildProps>((props: ChildProps, ref?: any) => {
 
     // todo:: for test
     props = fetch

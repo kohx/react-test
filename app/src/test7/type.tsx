@@ -19,11 +19,17 @@ export interface ChildProps {
     metaVersion?: string;
 }
 
+type Page = {
+    num: number
+    className: string
+}
+
 export type Paginate = {
     total: number
     current: number
     last: number
     start: number
     end: number
-    pages: Array<any>
+    pages: Page[]
 }
+
