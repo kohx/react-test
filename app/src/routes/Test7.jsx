@@ -15,7 +15,7 @@ import { constEditMode, constNumberingRule } from "@/test7Const";
 
 export default forwardRef((props, ref) => {
 
-    // todo:: test
+    // todo:: for test
     props = fetch
 
     // ライセンス
@@ -34,12 +34,11 @@ export default forwardRef((props, ref) => {
         console.log('set message!')
     }
 
-
     // スプレッドシートの設定
     let options = {
         worksheets: [{
             ...props.options,
-            // Todo:: 
+            // todo:: for test
             // pagination: 1000,
             pagination: 6,
             paginationOptions: [10, 25, 50, 100],
