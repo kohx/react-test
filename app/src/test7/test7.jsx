@@ -29,13 +29,27 @@ const isError = (jRef) => {
             columns.forEach((col, cIndex) => {
                 const cell = sheet.getCellFromCoords(cIndex, rIndex)
                 const value = sheet.getValueFromCoords(cIndex, rIndex)
-                if (!func.inputCheck(sheet, cell, cIndex, rIndex, value, fetch.setMessage, 1)) {
+                if (!func.inputCheck(sheet, cell, cIndex, rIndex, value, props.setMessage, 1)) {
                     isError = true;
                 }
             })
         }
     })
     return isError;
+}
+
+/**
+ * 更新(作成中)の場合にパッチバージョンを返却
+ * @param {Object} props 
+ * @returns 
+ */
+const updatePatchVersion = (props) => {
+
+    //パッチバージョンを取得する
+    if (props.editMode === constEditMode.update && props.metaVersion) {
+        const versionArray = metaVersion.split(".")
+        return parseInt(versionArray[2])
+    }
 }
 
 /**
@@ -52,6 +66,94 @@ const setRequireColumn = (jRef, options) => {
             jRef.current.jspreadsheet[0].headers[index].style.backgroundColor = "#cce3f6";
         }
     })
+}
+
+const setColumnDetails = (jRef, options, props) => {
+
+    // カラムから参照状態フラグ、表示順、追加対象外フラグのインデックスを取得
+    let refIndex
+    let seqIndex
+    let notCoveredIndex
+    let codeIndex
+    const columns = options.worksheets[0].columns
+
+    for (var i = 0; i < columns.length; i++) {
+        //コード
+        if (columns[i].metaKey === "code") {
+            codeIndex = i;
+            continue;
+        }
+        //参照状態フラグ
+        if (columns[i].metaKey === "referenceMetaFlag") {
+            refIndex = i;
+            continue;
+        }
+        //並び順
+        if (columns[i].metaKey === "seq") {
+            seqIndex = i;
+            continue;
+        }
+        //追加対象外フラグ
+        if (columns[i].metaKey === "notCoveredFlag") {
+            notCoveredIndex = i;
+            continue;
+        }
+    }
+
+    // 関連のあるメタの作成または新規バージョン登録
+    if (
+        // true
+        props.editMode === constEditMode.copyRelationCreate || props.editMode === constEditMode.newVersionCreate
+    ) {
+        const rows = options.worksheets[0].data
+        rows.forEach((row, i) => {
+            row.forEach((value, j) => {
+                // 参照フラグが2の場合は表示順と追加対象外フラグ以外は変更不可にする
+                if (rows[i][refIndex] === "2" && j !== seqIndex + 1 && j !== notCoveredIndex + 1) {
+                    // セルを取得
+                    const cell = jRef.current.jspreadsheet[0].getCellFromCoords(j, i)
+                    jRef.current.jspreadsheet[0].setReadOnly(cell, true)
+                }
+            })
+        })
+    }
+    // 承認済みの更新またはパッチバージョンが1以上の更新(作成中)
+    else if (
+        // false
+        props.editMode === constEditMode.approvedNewVersionCreate || (updatePatchVersion(props) && updatePatchVersion(props) > 0)
+    ) {
+        const rows = options.worksheets[0].data
+        // 参照状態フラグからセルの変更可否を設定
+        rows.forEach((row, i) => {
+            row.forEach((value, k) => {
+                // 追加対象外フラグについては参照フラグの値に関わらず変更不可
+                // 参照フラグが1または2の場合は表示順以外も変更不可にする
+                if (k === notCoveredIndex + 1 || k === codeIndex + 1 || ((value === "1" || rows[i][refIndex] === "2") && k !== seqIndex + 1)) {
+                    // セルを取得
+                    const cell = jRef.current.jspreadsheet[0].getCellFromCoords(k, i)
+                    jRef.current.jspreadsheet[0].setReadOnly(cell, true)
+                }
+            })
+        })
+    }
+    // 更新（作成中）
+    else if (
+        // true
+        props.editMode === constEditMode.update
+    ) {
+        // 参照状態フラグからセルの変更可否を設定
+        const rows = options.worksheets[0].data
+        rows.forEach((row, i) => {
+            row.forEach((value, l) => {
+                //参照フラグが2の場合は表示順以外は変更不可にする
+                if (rows[i][refIndex] === "2" && l !== seqIndex + 1 && l !== notCoveredIndex + 1) {
+                    // セルを取得
+                    const cell = jRef.current.jspreadsheet[0].getCellFromCoords(l, i)
+                    jRef.current.jspreadsheet[0].setReadOnly(cell, true)
+                }
+            })
+        })
+    }
 }
 
 /**
@@ -102,19 +204,20 @@ const createPaginate = (total, current) => {
  * @param {Number} fetchMode 
  * @param {Object} options 
  */
-const changeReadOnlyCell = (fetchMode, options) => {
-    if (fetchMode === 1) {
+const changeReadOnlyCell = (options, props) => {
+    // モード１
+    if (props.mode === 1) {
         // セルの編集不可
         options.worksheets[0].columns.map(column => column.readOnly = true)
     }
-    // ?????
-    else if (fetchMode === 2) {
+    // モード２
+    else if (props.mode === 2) {
         options.worksheets[0].columns.map(column => {
             // 関連のあるメタの作成
-            if (fetch.editMode === constEditMode.copyRelationCreate) {
+            if (props.editMode === constEditMode.copyRelationCreate) {
                 if (
                     column.title === "コード" &&
-                    fetch.numberingRule === constNumberingRule.auto
+                    props.numberingRule === constNumberingRule.auto
                 ) {
                     return (column.readOnly = true);
                 } else {
@@ -125,7 +228,7 @@ const changeReadOnlyCell = (fetchMode, options) => {
                     return (column.readOnly = true);
                 } else if (
                     column.title === "コード" &&
-                    fetch.numberingRule === constNumberingRule.auto
+                    props.numberingRule === constNumberingRule.auto
                 ) {
                     return (column.readOnly = true);
                 } else {
@@ -133,19 +236,6 @@ const changeReadOnlyCell = (fetchMode, options) => {
                 }
             }
         });
-    }
-}
-
-/**
- * 更新(作成中)の場合にパッチバージョンを返却
- * @param {Object} props 
- * @returns 
- */
-const updatePatchVersion = (props) => {
-    //パッチバージョンを取得する
-    if (fetch.editMode === constEditMode.update && props.metaVersion) {
-        const versionArray = metaVersion.split(".")
-        return parseInt(versionArray[2])
     }
 }
 
@@ -164,7 +254,7 @@ const contextMenu = (obj, x, y, e, items, section) => {
     var isUpdatePatchVersionUp = false;
 
     //パッチバージョンアップまたは更新(作成中)のパッチバージョンが1以上
-    if (fetch.editMode === constEditMode.approvedNewVersionCreate || (updatePatchVersion() && updatePatchVersion() > 0)) {
+    if (props.editMode === constEditMode.approvedNewVersionCreate || (updatePatchVersion(props) && updatePatchVersion(props) > 0)) {
         isUpdatePatchVersionUp = true;
     }
 
@@ -356,7 +446,7 @@ const inputCheck = (obj, cell, x, y, newValue, setMessage, mode) => {
     setMessage();
     obj.setComments(cellName, ``)
     //自動採番の場合はコードの背景色はグレー
-    if (x === 0 && fetch.numberingRule === constNumberingRule.auto) {
+    if (x === 0 && props.numberingRule === constNumberingRule.auto) {
         cell.style.backgroundColor = "#f3f3f3";
     } else {
         cell.style.backgroundColor = "#fff";
@@ -378,4 +468,4 @@ const onChange = (obj, cell, x, y, newValue, setMessage, mode) => {
     return inputCheck(obj, cell, x, y, newValue, setMessage, mode)
 }
 
-export default { isError, setRequireColumn, createPaginate, changeReadOnlyCell, contextMenu, onSelection, inputCheck, onChange }
+export default { isError, setRequireColumn, setColumnDetails, createPaginate, changeReadOnlyCell, contextMenu, onSelection, inputCheck, onChange }

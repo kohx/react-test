@@ -25,15 +25,17 @@ const shuffle = (cards) => {
 
 const cards = createCards()
 
+const getCard = (id) => cards.find(card => card.id === id)
+
 const Card = ({ id }) => {
 
     if (!id) return
 
-    const card = cards.find(card => card.id === id)
+    const card = getCard(id)
 
     return (
-        // <div style={{ color: `${card.color}` }}>[{card.id}] {card.mark}: {card.number} </div>
-        <div>{card.id}</div>
+        <div style={{ color: `${card.color}` }}>[{card.id}] {card.mark}: {card.number} </div>
+        // <div>{card.id}</div>
     )
 }
 
@@ -43,10 +45,10 @@ export default () => {
 
     const [draw, setDraw] = useState()
 
-    const [deck0, setDeck0] = useState({ code: 0, mark: '♦', ids: [], elm: useRef(null) })
-    const [deck1, setDeck1] = useState({ code: 1, mark: '♠', ids: [], elm: useRef(null) })
-    const [deck2, setDeck2] = useState({ code: 2, mark: '♥', ids: [], elm: useRef(null) })
-    const [deck3, setDeck3] = useState({ code: 3, mark: '♣', ids: [], elm: useRef(null) })
+    const [deck0, setDeck0] = useState({ code: 0, mark: '♦', color: "red", ids: [], elm: useRef(null) })
+    const [deck1, setDeck1] = useState({ code: 1, mark: '♠', color: "black", ids: [], elm: useRef(null) })
+    const [deck2, setDeck2] = useState({ code: 2, mark: '♥', color: "red", ids: [], elm: useRef(null) })
+    const [deck3, setDeck3] = useState({ code: 3, mark: '♣', color: "black", ids: [], elm: useRef(null) })
 
 
     const decks = {
@@ -97,6 +99,8 @@ export default () => {
             const open = table.open + 1
             setTable(table => { return { ...table, ids: [pick], open } })
         })
+
+        // todo 全部配る
     }
 
     const grabCard = (from, ids) => {
@@ -113,6 +117,33 @@ export default () => {
     const putCard = (target) => {
         if (grab.ids.length > 0) {
             if (target.hasOwnProperty('deck')) {
+
+                // todo チェックを入れる
+                const deck = target.deck
+                const deckCards = deck.ids.map(id => getCard(id))
+                const deckLength = deck.ids.length
+                const deckMaxNum = Math.max(deckCards.map(deckCard => deckCard.number))
+
+                console.log(deckMaxNum);
+                // console.log(deckCards.length)
+                // console.log(deckCards.map(deckCard => {
+                //     console.log(deckCard);
+                // }))
+                // console.log(deckCards.length !== 0 ? Math.max())
+
+                const res = grab.ids.some(id => {
+                    // const deckCards = deck.ids.map(ids => cards['id'])
+
+                    // const card = cards[id]
+                    // const isSameMark = deck.mark === cards[id].mark
+                    // const isEmpty = cards.length === 0
+                    // const isRightNumber = 
+
+
+                    return true
+                })
+                console.log(res)
+
                 target.setTable(deck => { return { ...deck, ids: [...deck.ids, ...grab.ids] } })
             }
 
@@ -145,7 +176,7 @@ export default () => {
                 </div>
 
                 {/* grab */}
-                <div style={{ padding: '1ch', backgroundColor: 'crimson', alignSelf: 'flex-start', borderRadius: '10px', color: 'white', fontSize: '1.4em' }}>
+                <div style={{ padding: '1ch', border: '1px solid crimson', alignSelf: 'flex-start', borderRadius: '10px', fontSize: '1.4em' }}>
                     grab from {grab.from}
                     {grab.ids.map(g => <Card key={g} id={g} />)}
                 </div>
@@ -157,9 +188,11 @@ export default () => {
                     const target = decks[deckName]
                     const ids = target.deck.ids
                     const elm = target.deck.elm
+                    const mark = target.deck.mark
+                    const color = target.deck.color
                     return (
                         <div className='deck' onMouseUp={() => putCard(target)} ref={elm} key={deckName} style={{ border: '1px solid olive', padding: '1ch' }} >
-                            {deckName}
+                            {deckName}: <span style={{ color: color }}>{mark}</span>
                             {ids.length > 0 && ids.map(id => <Card key={id} id={id} />)}
                         </div>
                     )
@@ -174,7 +207,7 @@ export default () => {
                     const elm = target.table.elm
                     return (
                         <div className='table' onMouseUp={() => putCard(target)} ref={elm} key={tableName} onMouseDown={() => grabCard(tableName, ids)} style={{ border: '1px solid tomato', padding: '1ch' }}>
-                            {tableName}:{target.table.open}
+                            {tableName}: {target.table.open}
                             {ids.length > 0 && ids.map(id => <Card key={id} id={id} />)}
                         </div>
                     )
