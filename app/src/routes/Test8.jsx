@@ -4,7 +4,7 @@ import { generatePath } from 'react-router-dom'
 const createCards = () => {
     let cards = []
     let count = 1
-    const templates = [{ code: 0, mark: '♦', color: 'red' }, { code: 1, mark: '♠', color: 'black' }, { code: 3, mark: '♥', color: 'red' }, { code: 3, mark: '♣', color: 'black' }]
+    const templates = [{ code: 0, mark: '♦', color: 'red' }, { code: 1, mark: '♠', color: 'black' }, { code: 2, mark: '♥', color: 'red' }, { code: 3, mark: '♣', color: 'black' }]
     templates.forEach(card => {
         for (let index = 1; index <= 3; index++) {
             cards.push({ id: count, number: index, ...card })
@@ -41,9 +41,11 @@ const Card = ({ id }) => {
 
 export default () => {
 
+    const [message, setMessage] = useState('')
+
     const [stock, setStock] = useState(shuffle(cards))
 
-    const [draw, setDraw] = useState()
+    const [draw, setDraw] = useState(null)
 
     const [deck0, setDeck0] = useState({ code: 0, mark: '♦', color: "red", ids: [], elm: useRef(null) })
     const [deck1, setDeck1] = useState({ code: 1, mark: '♠', color: "black", ids: [], elm: useRef(null) })
@@ -52,10 +54,10 @@ export default () => {
 
 
     const decks = {
-        deck0: { deck: deck0, setTable: setDeck0 },
-        deck1: { deck: deck1, setTable: setDeck1 },
-        deck2: { deck: deck2, setTable: setDeck2 },
-        deck3: { deck: deck3, setTable: setDeck3 },
+        deck0: { deck: deck0, setDeck: setDeck0 },
+        deck1: { deck: deck1, setDeck: setDeck1 },
+        deck2: { deck: deck2, setDeck: setDeck2 },
+        deck3: { deck: deck3, setDeck: setDeck3 },
     }
 
     const [table0, setTable0] = useState({ slot: 1, open: 0, ids: [], elm: useRef(null) })
@@ -121,35 +123,36 @@ export default () => {
                 // todo チェックを入れる
                 const deck = target.deck
                 const deckCards = deck.ids.map(id => getCard(id))
-                const deckLength = deck.ids.length
-                const deckMaxNum = Math.max(deckCards.map(deckCard => deckCard.number))
+                const deckNumbers = deckCards.map(deckCard => deckCard.number)
+                console.log(deckNumbers);
 
-                console.log(deckMaxNum);
-                // console.log(deckCards.length)
-                // console.log(deckCards.map(deckCard => {
-                //     console.log(deckCard);
-                // }))
-                // console.log(deckCards.length !== 0 ? Math.max())
+                const deckMaxNum = deckNumbers.length > 0 ? Math.max(...deckNumbers) : 0
+                const grabCard = getCard(grab.ids[0])
 
-                const res = grab.ids.some(id => {
-                    // const deckCards = deck.ids.map(ids => cards['id'])
+                const isSingle = grab.ids.length === 1
+                const isSameCode = deck.code === grabCard.code
+                const isRightNum = (deckMaxNum + 1) === grabCard.number
 
-                    // const card = cards[id]
-                    // const isSameMark = deck.mark === cards[id].mark
-                    // const isEmpty = cards.length === 0
-                    // const isRightNumber = 
-
-
-                    return true
-                })
-                console.log(res)
-
-                target.setTable(deck => { return { ...deck, ids: [...deck.ids, ...grab.ids] } })
+                if (isSingle && isSameCode && isRightNum) {
+                    setMessage('set!')
+                    target.setDeck(deck => { return { ...deck, ids: [...deck.ids, ...grab.ids] } })
+                    setDraw(null)
+                } else {
+                    setMessage('can not!')
+                    console.log(isSingle, isSameCode, isRightNum);
+                }
             }
 
-            if (target.hasOwnProperty('table')) {
-                console.log('table');
-            }
+            // if (target.hasOwnProperty('table')) {
+            //     const table = target.table
+            //     const tableCards = table.ids.map(id => getCard(id))
+            //     const tableMaxNum = Math.max(tableCards.map(tableCard => tableCard.number))
+
+            //     // const grabMaxNum = Math.max(grabCards.map(grabCard => grabCard.number))
+
+            //     const res = tableCards.some(grabCard => {
+            //     })
+            // }
         }
 
         setGrab(grab => { return { ...generatePath, from: null, ids: [] } })
@@ -162,11 +165,15 @@ export default () => {
 
     return (
         <div className='unselect'>
+            {message !== '' && <div style={{ textAlign: 'center', fontSize: '2em', color: 'orangered' }}>{message}</div>}
             <div style={{ display: 'flex', gap: '1ch', padding: '1ch' }}>
+
                 {/* stock */}
                 <div onClick={drawCard} style={{ border: '1px solid cornflowerblue', padding: '1ch' }}>
                     stock [{stock.length}]
+                    {/* <div style={{ display: 'none' }}> */}
                     {stock.map(s => <Card key={s} id={s} />)}
+                    {/* </div> */}
                 </div>
 
                 {/* draw */}
@@ -186,14 +193,11 @@ export default () => {
             <div style={{ display: 'flex', gap: '1ch', padding: '1ch' }}>
                 {Object.keys(decks).map(deckName => {
                     const target = decks[deckName]
-                    const ids = target.deck.ids
-                    const elm = target.deck.elm
-                    const mark = target.deck.mark
-                    const color = target.deck.color
+                    const deck = target.deck
                     return (
-                        <div className='deck' onMouseUp={() => putCard(target)} ref={elm} key={deckName} style={{ border: '1px solid olive', padding: '1ch' }} >
-                            {deckName}: <span style={{ color: color }}>{mark}</span>
-                            {ids.length > 0 && ids.map(id => <Card key={id} id={id} />)}
+                        <div className='deck' onMouseUp={() => putCard(target)} ref={deck.elm} key={deckName} style={{ border: '1px solid olive', padding: '1ch' }} >
+                            {deckName}: <span style={{ color: deck.color }}>{deck.mark}{deck.code}</span>{ }
+                            {deck.ids.length > 0 && deck.ids.map(id => <Card key={id} id={id} />)}
                         </div>
                     )
                 })}
@@ -203,12 +207,11 @@ export default () => {
             <div style={{ display: 'flex', gap: '1ch', padding: '1ch' }}>
                 {Object.keys(tables).map(tableName => {
                     const target = tables[tableName]
-                    const ids = target.table.ids
-                    const elm = target.table.elm
+                    const table = target.table
                     return (
-                        <div className='table' onMouseUp={() => putCard(target)} ref={elm} key={tableName} onMouseDown={() => grabCard(tableName, ids)} style={{ border: '1px solid tomato', padding: '1ch' }}>
-                            {tableName}: {target.table.open}
-                            {ids.length > 0 && ids.map(id => <Card key={id} id={id} />)}
+                        <div className='table' onMouseUp={() => putCard(target)} ref={table.elm} key={tableName} onMouseDown={() => grabCard(tableName, table.ids)} style={{ border: '1px solid tomato', padding: '1ch' }}>
+                            {tableName}: {table.open}
+                            {table.ids.length > 0 && table.ids.map(id => <Card key={id} id={id} />)}
                         </div>
                     )
                 })}
