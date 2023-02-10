@@ -15,23 +15,22 @@ const style = {
         display: 'flex',
         gap: '1ch',
         padding: '1ch',
-        position: 'relative',
     },
     grab: {
         padding: '1ch',
         border: '2px solid tomato',
         alignSelf: 'flex-start',
-        position: 'absolute',
-        insetBlockStart: 0,
-        insetInlineEnd: 0,
+        backgroundColor: 'white',
     },
     stock: {
         border: '1px solid lightgray',
         padding: '1ch',
+        flex: 1,
     },
     draw: {
         border: '1px solid cornflowerblue',
         padding: '1ch',
+        flex: 1,
     },
     tables: {
         display: 'flex',
@@ -41,6 +40,7 @@ const style = {
     table: {
         border: '1px solid cornflowerblue',
         padding: '1ch',
+        flex: 1,
     },
     slots: {
         border: '1px solid lightgray',
@@ -50,11 +50,12 @@ const style = {
     decks: {
         display: 'flex',
         gap: '1ch',
-        padding: '1ch',
+        flex: 4,
     },
     deck: {
         border: '1px solid olive',
         padding: '1ch',
+        flex: 1,
     },
     message: {
         textAlign: 'center',
@@ -213,7 +214,8 @@ export default () => {
 
                 // デッキを取得
                 const deck = target.deck
-                // デッキにあるカード
+
+                // デッキにあるカードID
                 const deckCards = deck.ids.map(id => getCard(id))
                 // デッキにあるカードのナンバーリスト
                 const deckNumbers = deckCards.map(deckCard => deckCard.number)
@@ -230,7 +232,7 @@ export default () => {
                 // チェック
                 if (isSingle && isSameCode && isRightNum) {
 
-                    // デッキにセット
+                    // デッキに追加
                     target.setDeck(deck => { return { ...deck, ids: [...deck.ids, ...grab.ids] } })
 
                     // ドローから来た場合
@@ -274,19 +276,37 @@ export default () => {
 
                 // テーブルを取得
                 const table = target.table
+                // テーブルにある最後のカードID
+                const tableCardId = table.ids[table.ids.length - 1]
+                // テーブルにある最後のカード
+                const tableCard = getCard(tableCardId)
+
+                // 違うコード（マーク）
+                const isOtherColor = grabCard.code !== tableCard.code
+                // 一つ少ない数
+                const isRightNum = (tableCard.number - 1) === grabCard.number
 
                 // チェック
-                if (isSingle && isSameCode && isRightNum) {
+                // if (isOtherColor && isRightNum) {
 
-                    // ドローから来た場合
-                    if (grab.origin === 'draw') {
-                        setDraw(null)
-                    }
-                    // テーブルから来た場合
-                    else {
+                // テーブルに追加
+                target.setTable(table => { return { ...table, ids: [...table.ids, ...grab.ids] } })
 
-                    }
+                // ドローから来た場合
+                if (grab.origin === 'draw') {
+                    setDraw(null)
                 }
+                // テーブルから来た場合
+                else {
+                    const { table: tableOrigin, setTable: setTableOrigin } = tables[grab.origin]
+                    console.log(tableOrigin);
+
+                }
+                setMessage('set!')
+                // } else {
+                //     console.log(isOtherColor, isRightNum)
+                //     setMessage('can not!')
+                // }
             }
             setGrab(grab => { return { ...generatePath, origin: null, ids: [] } })
         }
@@ -304,12 +324,6 @@ export default () => {
             {message !== '' && <div style={style.message}>{message}</div>}
 
             <div style={style.header}>
-                {/* grab */}
-                <div style={style.grab}>
-                    grab from {grab.origin}
-                    {grab.ids.map(g => <Card key={g} id={g} />)}
-                </div>
-
                 {/* stock */}
                 <div onClick={drawCard} style={style.stock}>
                     <div>stock [{stock.length}]</div>
@@ -319,8 +333,7 @@ export default () => {
                 </div>
 
                 {/* draw */}
-                <div style={style.draw} >
-                    draw
+                <div style={style.draw}>
                     <Card id={draw} origin={'draw'} gradCard={grabCard} />
                 </div>
 
@@ -331,11 +344,17 @@ export default () => {
                         const deck = target.deck
                         return (
                             <div className='deck' onMouseUp={() => putCard(target)} ref={deck.elm} key={deckName} style={style.deck} >
-                                {deckName}: <span style={{ color: deck.color }}>{deck.mark}</span>{ }
+                                <span style={{ color: deck.color }}>{deck.mark}</span>{ }
                                 {deck.ids.length > 0 && deck.ids.map(id => <Card key={id} id={id} />)}
                             </div>
                         )
                     })}
+                </div>
+
+                {/* grab */}
+                <div style={style.grab}>
+                    grab from {grab.origin}
+                    {grab.ids.map(g => <Card key={g} id={g} />)}
                 </div>
             </div>
 
