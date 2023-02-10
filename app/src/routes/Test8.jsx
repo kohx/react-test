@@ -287,26 +287,43 @@ export default () => {
                 const isRightNum = (tableCard.number - 1) === grabCard.number
 
                 // チェック
-                // if (isOtherColor && isRightNum) {
+                if (isOtherColor && isRightNum) {
 
-                // テーブルに追加
-                target.setTable(table => { return { ...table, ids: [...table.ids, ...grab.ids] } })
+                    // テーブルに追加
+                    target.setTable(table => { return { ...table, ids: [...table.ids, ...grab.ids] } })
 
-                // ドローから来た場合
-                if (grab.origin === 'draw') {
-                    setDraw(null)
+                    // ドローから来た場合
+                    if (grab.origin === 'draw') {
+                        setDraw(null)
+                    }
+                    // テーブルから来た場合
+                    else {
+                        const { table: tableOrigin, setTable: setTableOrigin } = tables[grab.origin]
+
+                        // オリジンテーブルに残るカードID
+                        let ids = tableOrigin.ids.filter(id => !grab.ids.includes(id))
+
+                        // オリジンテーブルが空になった場合
+                        if (ids.length < 1) {
+
+                            // オリジンスロットから取得
+                            const id = tableOrigin.slots[0]
+                            // オリジンスロットに残るカードID
+                            const slots = tableOrigin.slots.filter(slot => slot !== id)
+                            // オリジンスロットから取得したIDをテーブルに入れる
+                            ids = [id]
+
+                            // テーブルを更新
+                            setTableOrigin(table => { return { ...table, ids, slots } })
+                        } else {
+                            setTableOrigin(table => { return { ...table, ids } })
+                        }
+                    }
+                    setMessage('set!')
+                } else {
+                    console.log(isOtherColor, isRightNum)
+                    setMessage('can not!')
                 }
-                // テーブルから来た場合
-                else {
-                    const { table: tableOrigin, setTable: setTableOrigin } = tables[grab.origin]
-                    console.log(tableOrigin);
-
-                }
-                setMessage('set!')
-                // } else {
-                //     console.log(isOtherColor, isRightNum)
-                //     setMessage('can not!')
-                // }
             }
             setGrab(grab => { return { ...generatePath, origin: null, ids: [] } })
         }
