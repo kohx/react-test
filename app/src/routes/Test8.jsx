@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useLayoutEffect, useMemo, useCallback, createElement } from 'react'
 import { generatePath } from 'react-router-dom'
 
-const parCard = 5
+const parCard = 13
 
 const style = {
     card: {
