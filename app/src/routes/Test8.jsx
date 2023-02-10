@@ -21,11 +21,14 @@ const style = {
         border: '2px solid tomato',
         alignSelf: 'flex-start',
         backgroundColor: 'white',
+        flex: 1,
     },
     stock: {
         border: '1px solid lightgray',
         padding: '1ch',
         flex: 1,
+        overflow: 'scroll',
+        height: '300px',
     },
     draw: {
         border: '1px solid cornflowerblue',
@@ -61,6 +64,7 @@ const style = {
         textAlign: 'center',
         fontSize: '2em',
         color: 'orangered',
+        height: '50px',
     },
 }
 
@@ -131,8 +135,8 @@ export default () => {
     const [table2, setTable2] = useState({ slots: [], ids: [], elm: useRef(null) })
     const [table3, setTable3] = useState({ slots: [], ids: [], elm: useRef(null) })
     const [table4, setTable4] = useState({ slots: [], ids: [], elm: useRef(null) })
-    // const [table5, setTable5] = useState({ slots: [], ids: [], elm: useRef(null) })
-    // const [table6, setTable6] = useState({ slots: [], ids: [], elm: useRef(null) })
+    const [table5, setTable5] = useState({ slots: [], ids: [], elm: useRef(null) })
+    const [table6, setTable6] = useState({ slots: [], ids: [], elm: useRef(null) })
 
     const tables = {
         table0: { table: table0, setTable: setTable0 },
@@ -140,8 +144,8 @@ export default () => {
         table2: { table: table2, setTable: setTable2 },
         table3: { table: table3, setTable: setTable3 },
         table4: { table: table4, setTable: setTable4 },
-        // table5: { table: table5, setTable: setTable5 },
-        // table6: { table: table6, setTable: setTable6 },
+        table5: { table: table5, setTable: setTable5 },
+        table6: { table: table6, setTable: setTable6 },
     }
 
     const throwCard = () => {
@@ -338,7 +342,7 @@ export default () => {
 
     return (
         <div className='unselect'>
-            {message !== '' && <div style={style.message}>{message}</div>}
+            {<div style={style.message}>{message}</div>}
 
             <div style={style.header}>
                 {/* stock */}
