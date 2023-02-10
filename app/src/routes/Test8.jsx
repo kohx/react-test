@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useLayoutEffect, useMemo, useCallback, createElement } from 'react'
 import { generatePath } from 'react-router-dom'
 
-const parCard = 3
+const parCard = 5
 
 const style = {
     card: {
@@ -130,8 +130,8 @@ export default () => {
     const [table2, setTable2] = useState({ slots: [], ids: [], elm: useRef(null) })
     const [table3, setTable3] = useState({ slots: [], ids: [], elm: useRef(null) })
     const [table4, setTable4] = useState({ slots: [], ids: [], elm: useRef(null) })
-    const [table5, setTable5] = useState({ slots: [], ids: [], elm: useRef(null) })
-    const [table6, setTable6] = useState({ slots: [], ids: [], elm: useRef(null) })
+    // const [table5, setTable5] = useState({ slots: [], ids: [], elm: useRef(null) })
+    // const [table6, setTable6] = useState({ slots: [], ids: [], elm: useRef(null) })
 
     const tables = {
         table0: { table: table0, setTable: setTable0 },
@@ -139,8 +139,8 @@ export default () => {
         table2: { table: table2, setTable: setTable2 },
         table3: { table: table3, setTable: setTable3 },
         table4: { table: table4, setTable: setTable4 },
-        table5: { table: table5, setTable: setTable5 },
-        table6: { table: table6, setTable: setTable6 },
+        // table5: { table: table5, setTable: setTable5 },
+        // table6: { table: table6, setTable: setTable6 },
     }
 
     const throwCard = () => {
@@ -205,11 +205,11 @@ export default () => {
     const putCard = (target) => {
 
         if (grab.ids.length > 0) {
+            // つかんだカード
+            const grabCard = getCard(grab.ids[0])
+
             // デッキに入れる場合
             if (target.hasOwnProperty('deck')) {
-
-                // つかんだカード
-                const grabCard = getCard(grab.ids[0])
 
                 // デッキを取得
                 const deck = target.deck
@@ -270,14 +270,23 @@ export default () => {
 
             // テーブルに入れる場合
             if (target.hasOwnProperty('table')) {
-                //     const table = target.table
-                //     const tableCards = table.ids.map(id => getCard(id))
-                //     const tableMaxNum = Math.max(tableCards.map(tableCard => tableCard.number))
+                console.log('on table');
 
-                //     // const grabMaxNum = Math.max(grabCards.map(grabCard => grabCard.number))
+                // テーブルを取得
+                const table = target.table
 
-                //     const res = tableCards.some(grabCard => {
-                //     })
+                // チェック
+                if (isSingle && isSameCode && isRightNum) {
+
+                    // ドローから来た場合
+                    if (grab.origin === 'draw') {
+                        setDraw(null)
+                    }
+                    // テーブルから来た場合
+                    else {
+
+                    }
+                }
             }
             setGrab(grab => { return { ...generatePath, origin: null, ids: [] } })
         }
