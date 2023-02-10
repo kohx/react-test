@@ -40,11 +40,8 @@ export default forwardRef<Handles, ChildProps>((props: ChildProps, ref?: any) =>
             // todo:: for test
             // pagination: 1000,
             pagination: 6,
-            paginationOptions: [10, 25, 50, 100],
             // 列のドラッグ
             columnDrag: false,
-            // 列の並べ替えを
-            columnSorting: false,
             // Enter キーを使用して新しい列を追加
             allowInsertColumn: false,
         }],
@@ -63,7 +60,7 @@ export default forwardRef<Handles, ChildProps>((props: ChildProps, ref?: any) =>
     func.changeReadOnlyCell(props, options)
 
     // ワイドタイプで高さを変更
-    const tableHeight = props.widthType === 1 ? '30%' : '60%'
+    const tableHeight = props.widthType === 1 ? '40vh' : '45vh'
 
     // ステート ページネート
     const [paginate, setPaginate] = useState<Paginate>({ total: 0, current: 1, last: 1, start: 1, end: 1, pages: [] })

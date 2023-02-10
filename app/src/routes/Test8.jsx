@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useLayoutEffect, useMemo, useCallback, createElement } from 'react'
 import { generatePath } from 'react-router-dom'
 
-const parCard = 13
+const parCard = 3
 
 const style = {
     unselect: {
@@ -241,8 +241,10 @@ export default () => {
                 // 一つ多い数
                 const isRightNum = (deckMaxNum + 1) === grabCard.number
 
+                const isPutCard = isSingle && isSameCode && isRightNum
+
                 // チェック
-                if (isSingle && isSameCode && isRightNum) {
+                if (isPutCard) {
 
                     // デッキに追加
                     target.setDeck(deck => { return { ...deck, ids: [...deck.ids, ...grab.ids] } })
@@ -294,12 +296,17 @@ export default () => {
                 const tableCard = getCard(tableCardId)
 
                 // 違うコード（マーク）
-                const isOtherColor = grabCard.code !== tableCard.code
+                const isOtherColor = grabCard.code !== tableCard?.code
                 // 一つ少ない数
-                const isRightNum = (tableCard.number - 1) === grabCard.number
+                const isRightNum = (tableCard?.number - 1) === grabCard.number
 
+                // todo プットするテーブルがからのときOK
+                console.log('on!');
+                console.log(target);
+                console.log(table);
+                console.log(table.ids.length);
                 // チェック
-                if (isOtherColor && isRightNum) {
+                if (table.ids.length === 0 || (isOtherColor && isRightNum)) {
 
                     // テーブルに追加
                     target.setTable(table => { return { ...table, ids: [...table.ids, ...grab.ids] } })
