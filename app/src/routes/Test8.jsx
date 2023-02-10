@@ -4,6 +4,14 @@ import { generatePath } from 'react-router-dom'
 const parCard = 13
 
 const style = {
+    unselect: {
+        MozUserSelect: 'none',
+        WebkitUserSelect: 'none',
+        msUserSelect: 'none',
+        userSelect: 'none',
+        width: '80vw',
+        marginInline: 'auto',
+    },
     card: {
         flex: '0 0 100px',
         border: "1px solid black",
@@ -341,7 +349,7 @@ export default () => {
     }, [])
 
     return (
-        <div className='unselect'>
+        <div style={style.unselect}>
             {<div style={style.message}>{message}</div>}
 
             <div style={style.header}>
