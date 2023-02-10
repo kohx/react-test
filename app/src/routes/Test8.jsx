@@ -1,12 +1,14 @@
 import React, { useState, useRef, useEffect, useLayoutEffect, useMemo, useCallback, createElement } from 'react'
 import { generatePath } from 'react-router-dom'
 
+const parCard = 12
+
 const createCards = () => {
     let cards = []
-    let count = 1
+    let count = 0
     const templates = [{ code: 0, mark: '♦', color: 'red' }, { code: 1, mark: '♠', color: 'black' }, { code: 2, mark: '♥', color: 'red' }, { code: 3, mark: '♣', color: 'black' }]
     templates.forEach(card => {
-        for (let index = 1; index <= 3; index++) {
+        for (let index = 1; index <= parCard; index++) {
             cards.push({ id: count, number: index, ...card })
             count++
         }
@@ -24,19 +26,28 @@ const shuffle = (cards) => {
 }
 
 const cards = createCards()
+console.log(cards);
+
 
 const getCard = (id) => cards.find(card => card.id === id)
 
-const Card = ({ id }) => {
+const Card = ({ id, origin = null, gradCard = null }) => {
 
     if (!id) return
 
     const card = getCard(id)
 
-    return (
-        <div style={{ color: `${card.color}`, border: "1px solid black", borderRadius: '5px', padding: "0.5ch", margin: "0.5ch" }}>[{card.id}] {card.mark}: {card.number} </div>
-        // <div>{card.id}</div>
-    )
+    const style = {
+        flex: '0 0 100px', color: `${card.color}`, border: "1px solid black", borderRadius: '5px', padding: "0.5ch", margin: "0.5ch"
+    }
+
+    if (origin && gradCard) {
+        return (
+            <div onMouseDown={() => gradCard(origin, card.id)} style={style}>[{card.id}] {card.mark}: {card.number} </div>
+        )
+    }
+
+    return (<div style={style}>[{card.id}] {card.mark}: {card.number} </div>)
 }
 
 export default () => {
@@ -60,13 +71,13 @@ export default () => {
         deck3: { deck: deck3, setDeck: setDeck3 },
     }
 
-    const [table0, setTable0] = useState({ slot: 1, open: 0, ids: [], elm: useRef(null) })
-    const [table1, setTable1] = useState({ slot: 2, open: 0, ids: [], elm: useRef(null) })
-    const [table2, setTable2] = useState({ slot: 3, open: 0, ids: [], elm: useRef(null) })
-    const [table3, setTable3] = useState({ slot: 4, open: 0, ids: [], elm: useRef(null) })
-    const [table4, setTable4] = useState({ slot: 5, open: 0, ids: [], elm: useRef(null) })
-    const [table5, setTable5] = useState({ slot: 6, open: 0, ids: [], elm: useRef(null) })
-    const [table6, setTable6] = useState({ slot: 7, open: 0, ids: [], elm: useRef(null) })
+    const [table0, setTable0] = useState({ slots: [], ids: [], elm: useRef(null) })
+    const [table1, setTable1] = useState({ slots: [], ids: [], elm: useRef(null) })
+    const [table2, setTable2] = useState({ slots: [], ids: [], elm: useRef(null) })
+    const [table3, setTable3] = useState({ slots: [], ids: [], elm: useRef(null) })
+    const [table4, setTable4] = useState({ slots: [], ids: [], elm: useRef(null) })
+    const [table5, setTable5] = useState({ slots: [], ids: [], elm: useRef(null) })
+    const [table6, setTable6] = useState({ slots: [], ids: [], elm: useRef(null) })
 
     const tables = {
         table0: { table: table0, setTable: setTable0 },
@@ -77,8 +88,6 @@ export default () => {
         table5: { table: table5, setTable: setTable5 },
         table6: { table: table6, setTable: setTable6 },
     }
-
-    const [grab, setGrab] = useState({ origin: null, ids: [] })
 
     const drawCard = () => {
         const pick = stock[0]
@@ -92,24 +101,35 @@ export default () => {
     }
 
     const throwCard = () => {
-        let picks = stock.slice(0, 7)
+        const totalTable = Object.keys(tables).length
+        const totalThrow = totalTable * (totalTable + 1) / 2
+
+        // 配るID
+        let picks = stock.slice(0, totalThrow)
+
+        // 残りのID
         const rest = stock.filter(s => !picks.includes(s))
+
+        // 残りのIDをストックにセット
         setStock(stock => rest)
 
-        picks.forEach((pick, index) => {
-            const { table, setTable } = tables[`table${index}`]
-            const open = table.open + 1
-            setTable(table => { return { ...table, ids: [pick], open } })
+        Object.values(tables).forEach((table, tableIndex) => {
+            const ids = picks.slice(0, 1)
+            const slots = picks.slice(1, tableIndex + 1)
+            picks = picks.filter(p => ![...ids, ...slots].includes(p))
+            table.setTable(table => { return { ...table, ids, slots } })
         })
 
         // todo 全部配る
     }
 
-    const grabCard = (origin) => {
-        alert(origin)
-        console.log(origin);
+    const [grab, setGrab] = useState({ origin: null, ids: [] })
 
-        if (!ids || !ids.length) return
+    const grabCard = (origin, ids) => {
+
+        if (!ids || !ids.length || !origin) return
+
+        // カードをブラッブにセット
         setGrab(grab => { return { ...generatePath, origin, ids } })
     }
 
@@ -172,20 +192,20 @@ export default () => {
     return (
         <div className='unselect'>
             {message !== '' && <div style={{ textAlign: 'center', fontSize: '2em', color: 'orangered' }}>{message}</div>}
+
+            {/* stock */}
+            <div>stock [{stock.length}]</div>
+            <div style={{ display: 'flex', border: '1px solid lightgray', padding: '1ch', overflow: 'scroll' }}>
+                {/* <div style={{ display: 'none' }}> */}
+                {stock.map(s => <Card key={s} id={s} />)}
+                {/* </div> */}
+            </div>
+
             <div style={{ display: 'flex', gap: '1ch', padding: '1ch' }}>
-
-                {/* stock */}
-                <div onClick={drawCard} style={{ border: '1px solid lightgray', padding: '1ch' }}>
-                    stock [{stock.length}]
-                    {/* <div style={{ display: 'none' }}> */}
-                    {stock.map(s => <Card key={s} id={s} />)}
-                    {/* </div> */}
-                </div>
-
                 {/* draw */}
-                <div style={{ border: '1px solid cornflowerblue', padding: '1ch' }} >
+                <div onClick={drawCard} style={{ border: '1px solid cornflowerblue', padding: '1ch' }} >
                     draw
-                    <Card id={draw} onMouseDown={() => grabCard(draw)} />
+                    <Card id={draw} origin={'draw'} gradCard={grabCard} />
                 </div>
 
                 {/* grab */}
@@ -215,13 +235,24 @@ export default () => {
                     const target = tables[tableName]
                     const table = target.table
                     return (
-                        <div className='table' onMouseUp={() => putCard(target)} key={tableName} style={{ border: '1px solid cornflowerblue', padding: '1ch' }}>
-                            {tableName}: {table.open}
-                            {table.ids.length > 0 && table.ids.map(id => <Card key={id} id={id} onMouseDown={() => grabCard(id)} />)}
+                        <div className='table' key={tableName} style={{ border: '1px solid olive', padding: '1ch' }}>
+                            {tableName}
+
+                            <div style={{ border: '1px solid lightgray', padding: '1ch', marginBlockEnd: "1ch" }}>
+                                {table.slots.length > 0 && table.slots.map(slot =>
+                                    <Card key={slot} id={slot} origin={tableName} />
+                                )}
+                            </div>
+
+                            <div onMouseUp={() => putCard(target)} style={{ border: '1px solid cornflowerblue', padding: '1ch' }}>
+                                {table.ids.length > 0 && table.ids.map(id =>
+                                    <Card key={id} id={id} origin={tableName} gradCard={grabCard} />
+                                )}
+                            </div>
                         </div>
                     )
                 })}
             </div>
-        </div>
+        </div >
     )
 }
