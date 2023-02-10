@@ -1,4 +1,4 @@
-[
+export default [
     {
         "title": "Model",
         "width": 300,

@@ -1,7 +1,67 @@
 import React, { useState, useRef, useEffect, useLayoutEffect, useMemo, useCallback, createElement } from 'react'
 import { generatePath } from 'react-router-dom'
 
-const parCard = 12
+const parCard = 3
+
+const style = {
+    card: {
+        flex: '0 0 100px',
+        border: "1px solid black",
+        borderRadius: '5px',
+        padding: "0.5ch",
+        margin: "0.5ch",
+    },
+    header: {
+        display: 'flex',
+        gap: '1ch',
+        padding: '1ch',
+        position: 'relative',
+    },
+    grab: {
+        padding: '1ch',
+        border: '2px solid tomato',
+        alignSelf: 'flex-start',
+        position: 'absolute',
+        insetBlockStart: 0,
+        insetInlineEnd: 0,
+    },
+    stock: {
+        border: '1px solid lightgray',
+        padding: '1ch',
+    },
+    draw: {
+        border: '1px solid cornflowerblue',
+        padding: '1ch',
+    },
+    tables: {
+        display: 'flex',
+        gap: '1ch',
+        padding: '1ch',
+    },
+    table: {
+        border: '1px solid cornflowerblue',
+        padding: '1ch',
+    },
+    slots: {
+        border: '1px solid lightgray',
+        padding: '1ch',
+        marginBlockEnd: "1ch",
+    },
+    decks: {
+        display: 'flex',
+        gap: '1ch',
+        padding: '1ch',
+    },
+    deck: {
+        border: '1px solid olive',
+        padding: '1ch',
+    },
+    message: {
+        textAlign: 'center',
+        fontSize: '2em',
+        color: 'orangered',
+    },
+}
 
 const createCards = () => {
     let cards = []
@@ -26,8 +86,6 @@ const shuffle = (cards) => {
 }
 
 const cards = createCards()
-console.log(cards);
-
 
 const getCard = (id) => cards.find(card => card.id === id)
 
@@ -37,17 +95,13 @@ const Card = ({ id, origin = null, gradCard = null }) => {
 
     const card = getCard(id)
 
-    const style = {
-        flex: '0 0 100px', color: `${card.color}`, border: "1px solid black", borderRadius: '5px', padding: "0.5ch", margin: "0.5ch"
-    }
-
     if (origin && gradCard) {
         return (
-            <div onMouseDown={(event) => gradCard(origin, card.id)} style={style}>[{card.id}] {card.mark}: {card.number} </div>
+            <div onMouseDown={(event) => gradCard(origin, card.id)} style={{ ...style.card, color: card.color }}> [{card.id}] {card.mark}: {card.number} </div >
         )
     }
 
-    return (<div style={style}>[{card.id}] {card.mark}: {card.number} </div>)
+    return (<div style={{ ...style.card, color: card.color }}>[{card.id}] {card.mark}: {card.number} </div>)
 }
 
 export default () => {
@@ -89,17 +143,6 @@ export default () => {
         table6: { table: table6, setTable: setTable6 },
     }
 
-    const drawCard = () => {
-        const pick = stock[0]
-        let rest = [...stock]
-        rest = stock.filter(s => s !== pick)
-        if (draw) {
-            rest.push(draw)
-        }
-        setStock(stock => rest)
-        setDraw(draw => pick)
-    }
-
     const throwCard = () => {
         const totalTable = Object.keys(tables).length
         const totalThrow = totalTable * (totalTable + 1) / 2
@@ -119,6 +162,17 @@ export default () => {
             picks = picks.filter(p => ![...ids, ...slots].includes(p))
             table.setTable(table => { return { ...table, ids, slots } })
         })
+    }
+
+    const drawCard = () => {
+        const pick = stock[0]
+        let rest = [...stock]
+        rest = stock.filter(s => s !== pick)
+        if (draw) {
+            rest.push(draw)
+        }
+        setStock(stock => rest)
+        setDraw(draw => pick)
     }
 
     const [grab, setGrab] = useState({ origin: null, ids: [] })
@@ -151,32 +205,70 @@ export default () => {
     const putCard = (target) => {
 
         if (grab.ids.length > 0) {
+            // デッキに入れる場合
             if (target.hasOwnProperty('deck')) {
 
-                // todo チェックを入れる
-                const deck = target.deck
-                const deckCards = deck.ids.map(id => getCard(id))
-                const deckNumbers = deckCards.map(deckCard => deckCard.number)
-                console.log(deckNumbers);
-
-                const deckMaxNum = deckNumbers.length > 0 ? Math.max(...deckNumbers) : 0
+                // つかんだカード
                 const grabCard = getCard(grab.ids[0])
 
+                // デッキを取得
+                const deck = target.deck
+                // デッキにあるカード
+                const deckCards = deck.ids.map(id => getCard(id))
+                // デッキにあるカードのナンバーリスト
+                const deckNumbers = deckCards.map(deckCard => deckCard.number)
+                // デッキにあるカードの最大ナンバー
+                const deckMaxNum = deckNumbers.length > 0 ? Math.max(...deckNumbers) : 0
+
+                // デッキには一枚づつ
                 const isSingle = grab.ids.length === 1
+                // 同じコード（マーク）
                 const isSameCode = deck.code === grabCard.code
+                // 一つ多い数
                 const isRightNum = (deckMaxNum + 1) === grabCard.number
 
-
+                // チェック
                 if (isSingle && isSameCode && isRightNum) {
-                    setMessage('set!')
+
+                    // デッキにセット
                     target.setDeck(deck => { return { ...deck, ids: [...deck.ids, ...grab.ids] } })
-                    setDraw(null)
+
+                    // ドローから来た場合
+                    if (grab.origin === 'draw') {
+                        setDraw(null)
+                    }
+                    // テーブルから来た場合
+                    else {
+                        // テーブルの取得
+                        const { table, setTable } = tables[grab.origin]
+
+                        // テーブルに残るカードID
+                        let ids = table.ids.filter(id => !grab.ids.includes(id))
+
+                        // テーブルが空になった場合
+                        if (ids.length < 1) {
+
+                            // スロットから取得
+                            const id = table.slots[0]
+                            // スロットに残るカードID
+                            const slots = table.slots.filter(slot => slot !== id)
+                            // スロットから取得したIDをテーブルに入れる
+                            ids = [id]
+
+                            // テーブルを更新
+                            setTable(table => { return { ...table, ids, slots } })
+                        } else {
+                            setTable(table => { return { ...table, ids } })
+                        }
+                    }
+                    setMessage('set!')
                 } else {
+                    console.log(isSingle, isSameCode, isRightNum)
                     setMessage('can not!')
-                    console.log(isSingle, isSameCode, isRightNum);
                 }
             }
 
+            // テーブルに入れる場合
             if (target.hasOwnProperty('table')) {
                 //     const table = target.table
                 //     const tableCards = table.ids.map(id => getCard(id))
@@ -200,47 +292,46 @@ export default () => {
 
     return (
         <div className='unselect'>
-            {message !== '' && <div style={{ textAlign: 'center', fontSize: '2em', color: 'orangered' }}>{message}</div>}
+            {message !== '' && <div style={style.message}>{message}</div>}
 
+            <div style={style.header}>
+                {/* grab */}
+                <div style={style.grab}>
+                    grab from {grab.origin}
+                    {grab.ids.map(g => <Card key={g} id={g} />)}
+                </div>
 
-            <div style={{ display: 'flex', gap: '1ch', padding: '1ch' }}>
                 {/* stock */}
-                <div onClick={drawCard} style={{ border: '1px solid lightgray', padding: '1ch' }}>
+                <div onClick={drawCard} style={style.stock}>
                     <div>stock [{stock.length}]</div>
-                    <div style={{ display: 'none' }}>
-                        {stock.map(s => <Card key={s} id={s} />)}
-                    </div>
+                    {/* <div style={{ display: 'none' }}> */}
+                    {stock.map(s => <Card key={s} id={s} />)}
+                    {/* </div> */}
                 </div>
 
                 {/* draw */}
-                <div style={{ border: '1px solid cornflowerblue', padding: '1ch' }} >
+                <div style={style.draw} >
                     draw
                     <Card id={draw} origin={'draw'} gradCard={grabCard} />
                 </div>
 
-                {/* grab */}
-                <div style={{ padding: '1ch', border: '2px solid tomato', alignSelf: 'flex-start' }}>
-                    grab from {grab.origin}
-                    {grab.ids.map(g => <Card key={g} id={g} />)}
+                {/* decks */}
+                <div style={style.decks}>
+                    {Object.keys(decks).map(deckName => {
+                        const target = decks[deckName]
+                        const deck = target.deck
+                        return (
+                            <div className='deck' onMouseUp={() => putCard(target)} ref={deck.elm} key={deckName} style={style.deck} >
+                                {deckName}: <span style={{ color: deck.color }}>{deck.mark}</span>{ }
+                                {deck.ids.length > 0 && deck.ids.map(id => <Card key={id} id={id} />)}
+                            </div>
+                        )
+                    })}
                 </div>
             </div>
 
-            {/* decks */}
-            <div style={{ display: 'flex', gap: '1ch', padding: '1ch' }}>
-                {Object.keys(decks).map(deckName => {
-                    const target = decks[deckName]
-                    const deck = target.deck
-                    return (
-                        <div className='deck' onMouseUp={() => putCard(target)} ref={deck.elm} key={deckName} style={{ border: '1px solid olive', padding: '1ch' }} >
-                            {deckName}: <span style={{ color: deck.color }}>{deck.mark}{deck.code}</span>{ }
-                            {deck.ids.length > 0 && deck.ids.map(id => <Card key={id} id={id} />)}
-                        </div>
-                    )
-                })}
-            </div>
-
             {/* tables */}
-            <div style={{ display: 'flex', gap: '1ch', padding: '1ch' }}>
+            <div style={style.tables}>
                 {Object.keys(tables).map(tableName => {
                     const target = tables[tableName]
                     const table = target.table
@@ -248,13 +339,13 @@ export default () => {
                         <div key={tableName} style={{ border: '1px solid olive', padding: '1ch' }}>
                             {tableName}
 
-                            {table.slots.length > 0 && <div style={{ border: '1px solid lightgray', padding: '1ch', marginBlockEnd: "1ch" }}>
+                            {table.slots.length > 0 && <div style={style.slots}>
                                 {table.slots.map(slot =>
                                     <Card key={slot} id={slot} />
                                 )}
                             </div>}
 
-                            <div className='table' onMouseUp={() => putCard(target)} style={{ border: '1px solid cornflowerblue', padding: '1ch' }}>
+                            <div className='table' onMouseUp={() => putCard(target)} style={style.table}>
                                 {table.ids.length > 0 && table.ids.map(id =>
                                     <Card key={id} id={id} origin={tableName} gradCard={grabCard} />
                                 )}
