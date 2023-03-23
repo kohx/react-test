@@ -99,6 +99,20 @@ export default () => {
                         to="/test8"
                     >Test8</NavLink>
                 </li>
+                <li>
+                    <NavLink
+                        style={({ isActive }) => (isActive ? activeStyle : undefined)}
+                        className={({ isActive }) => (isActive ? activeClass : undefined)}
+                        to="/test9"
+                    >Test9</NavLink>
+                </li>
+                <li>
+                    <NavLink
+                        style={({ isActive }) => (isActive ? activeStyle : undefined)}
+                        className={({ isActive }) => (isActive ? activeClass : undefined)}
+                        to="/test10"
+                    >Test10</NavLink>
+                </li>
             </ul>
 
             <button onClick={() => navigate('/')}>back to home</button>

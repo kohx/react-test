@@ -49,7 +49,7 @@ export default {
   },
 
   getRecords(data = null) {
-    const url = `http://localhost:3000/json/records.json`
+    const url = `http://localhost:3000/json/test.json`
     return axios.get(url, data)
   },
   getColumns(data = null) {

@@ -2,6 +2,10 @@ import { constEditMode, constNumberingRule } from "@/test7Const";
 import { ChildProps, Handles, Paginate } from '@/test7/type'
 
 
+const handleResize = () => {
+
+}
+
 /**
  * isError
  * @param jRef 
@@ -64,12 +68,18 @@ const updatePatchVersion = (props: ChildProps): number => {
  */
 const setRequireColumn = (jRef: any, options: any): void => {
     options.worksheets[0].columns.forEach((col: any, index: number) => {
-        if (col.isRequire) {
-            jRef.current.jspreadsheet[0].headers[index].innerText += " *";
-            jRef.current.jspreadsheet[0].headers[index].style.backgroundColor = "#f2dede";
-        } else {
-            jRef.current.jspreadsheet[0].headers[index].style.backgroundColor = "#cce3f6";
-        }
+        options.worksheets[0].columns.forEach((col: any, index: number) => {
+            const header = jRef.current.jspreadsheet[0].headers[index]
+            if (col.isRequire && header) {
+                const pos = header.innerText.indexOf('*')
+                if (pos === -1) {
+                    header.innerText += " *";
+                }
+                header.style.backgroundColor = "#f2dede";
+            } else if (header) {
+                header.style.backgroundColor = "#cce3f6";
+            }
+        })
     })
 }
 
@@ -478,4 +488,4 @@ const onChange = (obj: any, cell: any, x: number, y: number, newValue: any, setM
     return inputCheck(obj, cell, x, y, newValue, setMessage, mode, props)
 }
 
-export default { isError, setRequireColumn, setColumnDetails, createPaginate, changeReadOnlyCell, contextMenu, onSelection, inputCheck, onChange }
+export default { handleResize, isError, setRequireColumn, setColumnDetails, createPaginate, changeReadOnlyCell, contextMenu, onSelection, inputCheck, onChange }

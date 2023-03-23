@@ -27,6 +27,7 @@ export default forwardRef<Handles, ChildProps>((props: ChildProps, ref?: any) =>
 
     // スプレッドシートの要素
     const jRef = useRef<any>(null)
+    const jWrap = useRef<any>(null)
 
     const isError = func.isError
     useImperativeHandle(ref, () => ({
@@ -37,6 +38,7 @@ export default forwardRef<Handles, ChildProps>((props: ChildProps, ref?: any) =>
     let options: any = {
         worksheets: [{
             ...props.options,
+            tableOverflow: true,
             // todo:: for test
             // pagination: 1000,
             pagination: 6,
@@ -59,18 +61,15 @@ export default forwardRef<Handles, ChildProps>((props: ChildProps, ref?: any) =>
     // セルの編集不可
     func.changeReadOnlyCell(props, options)
 
-    // ワイドタイプで高さを変更
-    const tableHeight = props.widthType === 1 ? '40vh' : '45vh'
-
     // ステート ページネート
-    const [paginate, setPaginate] = useState<Paginate>({ total: 0, current: 1, last: 1, start: 1, end: 1, pages: [] })
+    // const [paginate, setPaginate] = useState<Paginate>({ total: 0, current: 1, last: 1, start: 1, end: 1, pages: [] })
 
     // ページの切り替え
-    const toPage = (current: number) => {
-        const { last, start, end, pages } = func.createPaginate(paginate.total, current)
-        jRef.current.jspreadsheet[0].page(current - 1)
-        setPaginate(paginate => { return { ...paginate, current, last, start, end, pages } })
-    }
+    // const toPage = (current: number) => {
+    //     const { last, start, end, pages } = func.createPaginate(paginate.total, current)
+    //     jRef.current.jspreadsheet[0].page(current - 1)
+    //     setPaginate(paginate => { return { ...paginate, current, last, start, end, pages } })
+    // }
 
     // フックエフェクト
     useEffect(() => {
@@ -80,6 +79,7 @@ export default forwardRef<Handles, ChildProps>((props: ChildProps, ref?: any) =>
 
             // スプレッドシートの表示
             jspreadsheet(jRef.current, options)
+
 
             // ヘッダの必須項目に「*」と色を付ける
             func.setRequireColumn(jRef, options)
@@ -91,20 +91,84 @@ export default forwardRef<Handles, ChildProps>((props: ChildProps, ref?: any) =>
             func.setColumnDetails(jRef, options, props)
 
             // ページネート
-            const total = jRef.current.jspreadsheet[0].quantityOfPages()
-            const current = jRef.current.jspreadsheet[0].pageNumber + 1
-            const { last, start, end, pages } = func.createPaginate(total, current)
-            setPaginate(paginate => { return { ...paginate, total, current, last, start, end, pages } })
+            // const total = jRef.current.jspreadsheet[0].quantityOfPages()
+            // const current = jRef.current.jspreadsheet[0].pageNumber + 1
+            // const { last, start, end, pages } = func.createPaginate(total, current)
+            // setPaginate(paginate => { return { ...paginate, total, current, last, start, end, pages } })
         }
-    }, [options, props, paginate])
+
+        // ハンドルリサイズ関数を作成
+        const handleResize = () => {
+            const width = jWrap.current.clientWidth
+            const height = props.widthType === 2 ? "300px" : "200px"
+            console.log(jWrap.current.clientWidth)
+            console.log(height)
+            jRef.current.jspreadsheet[0].setViewport(width, height)
+        }
+
+        // 最初の実行
+        handleResize()
+
+        // リサイズイベント
+        window.addEventListener('resize', handleResize)
+
+        // クリーンアップ処理: リターンでイベントを削除
+        return () => window.removeEventListener('resize', handleResize)
+
+        const handleScroll = () => {
+
+        }
+    }, [options, props,
+        // paginate,
+    ])
+
+    // フックエフェクト
+    useEffect(() => {
+
+        // ハンドルリサイズ関数を作成
+        const handleResize = () => {
+            const width = jWrap.current.clientWidth
+            const height = props.widthType === 2 ? "300px" : "200px"
+            console.log(jWrap.current.clientWidth)
+            console.log(height)
+            jRef.current.jspreadsheet[0].setViewport(width, height)
+        }
+
+        // 最初の実行
+        handleResize()
+
+        // リサイズイベント
+        window.addEventListener('resize', handleResize)
+
+        // クリーンアップ処理: リターンでイベントを削除
+        return () => window.removeEventListener('resize', handleResize)
+    }, [props])
+
+    // フックエフェクト
+    useEffect(() => {
+
+        const jssContent = document.querySelector('.jss_content')!
+        console.log(jssContent);
+
+        // ハンドルスクロール関数を作成
+        const handleTableScroll = (event: Event) => {
+            func.setRequireColumn(jRef, options)
+        }
+
+        // スクロールイベント
+        jssContent.addEventListener('scroll', handleTableScroll)
+
+        // クリーンアップ処理: リターンでイベントを削除
+        return () => jssContent.removeEventListener('resize', handleTableScroll)
+    }, [props])
 
     return (
         <>
             <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Material+Icons" />
-            <div className="test7-wrapper" style={{ height: tableHeight }}>
+            <div className="test7-wrapper" ref={jWrap}>
                 <div className='test7-table' ref={jRef} />
             </div>
-            <div className='pagination'>
+            {/* <div className='pagination'>
                 <div>{paginate.total}ページ中 {paginate.current}ページを表示</div>
                 <ul className='pagination__list'>
                     {paginate.start !== paginate.current && <li className="pagination__item" onClick={() => toPage(1)}>&lt;</li>}
@@ -113,7 +177,7 @@ export default forwardRef<Handles, ChildProps>((props: ChildProps, ref?: any) =>
                     )}
                     {paginate.end !== paginate.current && <li className="pagination__item" onClick={() => toPage(paginate.last)}>&gt;</li>}
                 </ul>
-            </div>
+            </div> */}
         </>
     )
 })

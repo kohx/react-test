@@ -1,9 +1,16 @@
 import React from 'react'
 import { useSelector } from "react-redux";
+import api from '@/lib/axios/api'
+import Async from '@/components/redux/Async';
 
 export default () => {
 
-    const user = useSelector((state) => state.userReducer.user)    
+    (async () => {
+
+        console.log(await api.getRecords())
+    })()
+
+    const user = useSelector((state) => state.userReducer.user)
 
     return (
         <div>

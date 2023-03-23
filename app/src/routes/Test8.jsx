@@ -110,7 +110,7 @@ const Card = ({ id, origin = null, gradCard = null }) => {
 
     if (origin && gradCard) {
         return (
-            <div onMouseDown={(event) => gradCard(origin, card.id)} style={{ ...style.card, color: card.color }}> [{card.id}] {card.mark}: {card.number} </div >
+            <div onMouseDown={(event) => gradCard(originName, card.id)} style={{ ...style.card, color: card.color }}> [{card.id}] {card.mark}: {card.number} </div >
         )
     }
 
@@ -190,23 +190,23 @@ export default () => {
 
     const [grab, setGrab] = useState({ origin: null, ids: [] })
 
-    const grabCard = (origin, id) => {
+    const grabCard = (originName, id) => {
 
-        if (!id || !origin) return
+        if (!id || !originName) return
 
         let ids
-        if (origin === 'draw') {
+        if (originName === 'draw') {
             ids = [id]
         } else {
             const cardNum = getCard(id).number
-            const table = tables[origin].table
+            const table = tables[originName].table
             const tableCards = table.ids.map(id => getCard(id))
             const lowerCard = tableCards.filter(tableCard => tableCard.number <= cardNum)
             ids = lowerCard.map(card => card.id)
         }
 
         // カードをブラッブにセット
-        setGrab(grab => { return { ...generatePath, origin, ids } })
+        setGrab(grab => { return { ...generatePath, originName, ids } })
     }
 
     const releaseCard = (event) => {
