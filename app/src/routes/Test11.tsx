@@ -3,6 +3,7 @@ import Tree from "../components/Tree";
 import type { TreeItems } from "../components/Tree/types";
 import type { UniqueIdentifier } from "@dnd-kit/core";
 
+// dummy data received by props
 const defaultIdList: TreeItems = [
   {
     id: "test1",
@@ -30,10 +31,7 @@ const defaultIdList: TreeItems = [
   },
 ];
 
-interface Props {
-  defaultIdList: responseItem;
-}
-
+// type response item
 type responseItem = {
   id: UniqueIdentifier;
   children?: responseItem[];
@@ -43,16 +41,32 @@ type responseItem = {
   parent?: string | null;
 };
 
-// export default (items: responseItem, setItems: React.Dispatch<React.SetStateAction<TreeItems>>) => {
+// type response items
+type responseItems = responseItem[]
+
+// type props
+type Props = {
+  defaultIdList: responseItems;
+};
+
+// export default (items: responseItems, setItems: React.Dispatch<React.SetStateAction<TreeItems>>) => {
 export default () => {
+
+  // dummy data received by props
   const [items, setItems] = useState(() => defaultIdList);
   console.log(items);
 
+  // get item function
   const getItems = () => {
+
+    // declare depth
     let depth = 0;
+
+    // declare response items
     let responseItems: responseItem[] = [];
 
-    const recursion = (items: responseItem[]): void => {
+    // recursion function for get depth and parent
+    const recursionDepthAndParent = (items: responseItem[]): void => {
       if (items.length > 0) {
         depth++;
         let children: any[] = [];
@@ -69,14 +83,19 @@ export default () => {
         }
         // console.log(children);
         if (children.length > 0) {
-          recursion(children);
+          recursionDepthAndParent(children);
         }
       }
     };
-    recursion(items);
 
+    // do function
+    recursionDepthAndParent(items);
+
+    // declare order
     let order = 0;
-    const orders = (items: TreeItems): void => {
+
+    // recursion function for get order
+    const recursionOrders = (items: TreeItems): void => {
       if (items.length > 0) {
         for (const item of items) {
           order++;
@@ -85,12 +104,15 @@ export default () => {
             (responseItem) => item.id === responseItem.id
           );
           if (target) target.order = order;
-          orders(item.children);
+          recursionOrders(item.children);
         }
       }
     };
-    orders(items);
 
+    // do function
+    recursionOrders(items);
+
+    // sort by order
     responseItems.sort((a, b) => {
       if (a.order && b.order) {
         if (a.order < b.order) return -1;
@@ -102,11 +124,25 @@ export default () => {
     console.log(responseItems);
   };
 
+  // style for tree
+  const styleTree = {
+    border: "2px solid tomato",
+    width: "90vw",
+    marginInline: "auto",
+  };
+
+  // style for button
+  const styleBnt = {
+    margin: "10px",
+  };
+
   return (
-    <>
-      <button onClick={() => getItems()}>get item from parent</button>
+    <div style={styleTree}>
+      <button style={styleBnt} onClick={() => getItems()}>
+        get item from parent
+      </button>
 
       <Tree items={items} setItems={setItems} />
-    </>
+    </div>
   );
 };
