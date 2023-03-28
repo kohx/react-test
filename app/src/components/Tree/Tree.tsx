@@ -88,7 +88,7 @@ export default forwardRef<HTMLHeadingElement, Props>(
     {
       items,
       setItems,
-      collapsible = true,
+      collapsible = false,
       indicator = false,
       indentationWidth = 50,
       removable = false,
