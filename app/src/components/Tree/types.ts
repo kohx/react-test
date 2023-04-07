@@ -5,6 +5,11 @@ export interface TreeItem {
   id: UniqueIdentifier;
   children: TreeItem[];
   collapsed?: boolean;
+  index?: number;
+  title?: string | number | boolean;
+  parentKey?: string | number | boolean;
+  childKey?: string | number | boolean;
+  childrenItem?: TreeItem[];
 }
 
 export type TreeItems = TreeItem[];
