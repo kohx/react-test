@@ -1,5 +1,4 @@
 import type { UniqueIdentifier } from "@dnd-kit/core";
-import type { TreeItems } from "../components/Tree/types";
 
 // type response item
 type ResponseItem = {
